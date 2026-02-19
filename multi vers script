@@ -1,0 +1,197 @@
+-- [[ BANANA HUB - NDS DEDICATED VERSION ]] --
+local PlaceId = game.PlaceId
+
+-- Sprawdzamy ID gry na samym początku
+if PlaceId == 189707 then
+    
+    -- Ładujemy bibliotekę dopiero gdy ID się zgadza
+    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+    local Window = Rayfield:CreateWindow({
+       Name = "🍌 Banana Hub | NDS Edition",
+       LoadingTitle = "Ładowanie Banana Hub...",
+       LoadingSubtitle = "Tylko dla Natural Disaster Survival",
+       ConfigurationSaving = {
+          Enabled = true,
+          FolderName = "BananaHub_NDS",
+          FileName = "NDS_Config"
+       },
+       KeySystem = false
+    })
+
+    local LP = game:GetService("Players").LocalPlayer
+    local RunService = game:GetService("RunService")
+
+    -- Zmienne dla funkcji
+    local Settings = {
+        WalkSpeed = 16,
+        AutoFarm = false,
+        GodMode = false,
+        InfJump = false
+    }
+
+    -- [[ BYPASS WALKSPEED ]] --
+    local mt = getrawmetatable(game)
+    local oldIndex = mt.__index
+    setreadonly(mt, false)
+    mt.__index = newcclosure(function(t, k)
+        if not checkcaller() and t:IsA("Humanoid") and k == "WalkSpeed" then
+            return 16
+        end
+        return oldIndex(t, k)
+    end)
+    setreadonly(mt, true)
+
+    -- --- ZAKŁADKA 1: GŁÓWNE (Universal wewnątrz NDS) ---
+    local MainTab = Window:CreateTab("Główne", nil)
+    
+    MainTab:CreateSection("Movement & Survival")
+
+    MainTab:CreateSlider({
+       Name = "WalkSpeed Bypass",
+       Range = {16, 150},
+       Increment = 1,
+       CurrentValue = 16,
+       Callback = function(Value)
+            Settings.WalkSpeed = Value
+            if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+                LP.Character.Humanoid.WalkSpeed = Value
+            end
+       end,
+    })
+
+    MainTab:CreateToggle({
+       Name = "Infinite Jump",
+       CurrentValue = false,
+       Callback = function(Value)
+            Settings.InfJump = Value
+            game:GetService("UserInputService").JumpRequest:Connect(function()
+                if Settings.InfJump and LP.Character:FindFirstChildOfClass("Humanoid") then
+                    LP.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+                end
+            end)
+       end,
+    })
+
+    MainTab:CreateToggle({
+       Name = "God Mode (No Fall/Water/HP)",
+       CurrentValue = false,
+       Callback = function(Value)
+            Settings.GodMode = Value
+            if Value then
+                _G.GodLoop = RunService.Stepped:Connect(function()
+                    if LP.Character then
+                        local hum = LP.Character:FindFirstChildOfClass("Humanoid")
+                        if hum then 
+                            hum.Health = hum.MaxHealth 
+                            if hum:GetState() == Enum.HumanoidStateType.Freefall then
+                                hum:ChangeState(Enum.HumanoidStateType.Physics)
+                            end
+                        end
+                        if LP.Character:FindFirstChild("FallDamageScript") then LP.Character.FallDamageScript:Destroy() end
+                        local water = workspace:FindFirstChild("WaterLevel")
+                        if water then water.CanTouch = false end
+                    end
+                end)
+            else
+                if _G.GodLoop then _G.GodLoop:Disconnect() end
+            end
+       end,
+    })
+
+    -- --- ZAKŁADKA 2: NDS OP (10 Funkcji) ---
+    local NDSTab = Window:CreateTab("NDS OP", nil)
+    
+    NDSTab:CreateSection("Auto-Farm & Cheats")
+
+    -- 1. Auto-Farm
+    NDSTab:CreateToggle({
+        Name = "1. Auto-Win (Hard Anchor)",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.AutoFarm = Value
+            task.spawn(function()
+                while _G.AutoFarm do
+                    local status = LP.PlayerGui.MainGui.Status.Value
+                    if status ~= "" and not status:find("Waiting") then
+                        if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                            LP.Character:PivotTo(CFrame.new(-60, 650, 0))
+                            LP.Character.HumanoidRootPart.Anchored = true
+                        end
+                    else
+                        if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                            LP.Character.HumanoidRootPart.Anchored = false
+                        end
+                        if status:find("Waiting") then
+                            LP.Character:PivotTo(CFrame.new(-60, 50, 0))
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+    })
+
+    -- Pozostałe funkcje (Predictor, Bright, TP itp.)
+    NDSTab:CreateToggle({
+        Name = "2. Disaster Predictor",
+        CurrentValue = false,
+        Callback = function(v)
+            _G.Predict = v
+            task.spawn(function()
+                local last = ""
+                while _G.Predict do
+                    local s = LP.PlayerGui.MainGui.Status.Value
+                    if s ~= "" and s ~= last and not s:find("Waiting") then
+                        last = s
+                        Rayfield:Notify({Title = "Banana Hub", Content = "Nadchodzi: "..s})
+                    end
+                    task.wait(1)
+                end
+            end)
+        end
+    })
+
+    NDSTab:CreateButton({ Name = "3. Usuń Budynki (FPS Boost)", Callback = function() if workspace:FindFirstChild("Structure") then workspace.Structure:Destroy() end end })
+    NDSTab:CreateButton({ Name = "4. Full Bright", Callback = function() game:GetService("Lighting").Brightness = 2 game:GetService("Lighting").ClockTime = 14 end })
+    NDSTab:CreateButton({ Name = "5. TP na szczyt mapy", Callback = function() 
+        local h = 0 local t = nil
+        for _,v in pairs(workspace.Structure:GetChildren()) do if v:IsA("BasePart") and v.Position.Y > h then h = v.Position.Y t = v end end
+        if t then LP.Character:PivotTo(t.CFrame + Vector3.new(0,5,0)) end
+    end })
+    NDSTab:CreateButton({ Name = "6. TP do Balonu", Callback = function() 
+        local b = workspace:FindFirstChild("GreenBalloon", true)
+        if b then LP.Character:PivotTo(b.CFrame) else Rayfield:Notify({Title="Błąd", Content="Brak balonu"}) end
+    end })
+    NDSTab:CreateButton({ Name = "7. Usuń Mgłę/Burzę", Callback = function() game:GetService("Lighting"):ClearAllChildren() end })
+    NDSTab:CreateToggle({
+        Name = "8. Ignoruj Lawę/Ogień",
+        CurrentValue = false,
+        Callback = function(v)
+            _G.NoLava = v
+            task.spawn(function()
+                while _G.NoLava do
+                    for _,part in pairs(workspace:GetDescendants()) do
+                        if part.Name == "Lava" or part.Name == "Fire" then part.CanTouch = false end
+                    end
+                    task.wait(2)
+                end
+            end)
+        end
+    })
+    NDSTab:CreateButton({ Name = "9. Teleport na Wyspę", Callback = function() LP.Character:PivotTo(CFrame.new(-60, 50, 0)) end })
+    NDSTab:CreateButton({ Name = "10. Szybka Regeneracja", Callback = function() LP.Character.Humanoid.Health = 100 end })
+
+    -- Respawn Fix
+    LP.CharacterAdded:Connect(function(char)
+        local h = char:WaitForChild("Humanoid")
+        task.wait(0.5)
+        h.WalkSpeed = Settings.WalkSpeed
+    end)
+
+    Rayfield:Notify({Title = "Banana Hub", Content = "Pomyślnie załadowano moduł NDS!"})
+
+else
+    -- Jeśli ID gry jest inne niż NDS
+    print("laduje inny script.")
+end
