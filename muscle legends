@@ -1,31 +1,33 @@
+-- [[ SPRAWDZANIE PLACE ID ]] --
+local targetPlaceId = 3623096087
 
-local PlaceId = game.PlaceId
+if game.PlaceId ~= targetPlaceId then
+    warn("Banana Hub: To nie jest Muscle Legends! Skrypt nie został załadowany.")
+    return -- Zatrzymuje skrypt, jeśli ID się nie zgadza
+end
 
--- Sprawdzamy ID gry na samym początku
-if PlaceId == 3623096087 then
-
+-- [[ ŁADOWANIE LUNY ]] --
 local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/master/source.lua", true))()
 
--- [[ KONFIGURACJA OKNA ]] --
 local Window = Luna:CreateWindow({
 	Name = "Banana Hub 🍌",
-	Subtitle = "Muscle Legends Edition",
-	LogoID = "nil", -- Możesz wkleić ID logo jeśli masz
+	Subtitle = "Muscle Legends Protection",
+	LogoID = "nil",
 	LoadingEnabled = true,
-	LoadingTitle = "Banana Hub v5",
-	LoadingSubtitle = "by Gemini AI",
+	LoadingTitle = "Weryfikacja Mapy...",
+	LoadingSubtitle = "Muscle Legends Wykryte!",
 
 	ConfigSettings = {
 		ConfigFolder = "BananaHubML"
 	},
 
-	KeySystem = false -- Wyłączyłem klucz, żebyś mógł od razu odpalać
+	KeySystem = false
 })
 
 -- [[ HOME TAB ]] --
 Window:CreateHomeTab({
 	SupportedExecutors = {"All"},
-	DiscordInvite = "banana", -- Tu możesz wpisać swój discord
+	DiscordInvite = "banana",
 	Icon = 1
 })
 
@@ -39,15 +41,15 @@ getgenv().SavedPos = nil
 -- [[ ZAKŁADKA GŁÓWNA ]] --
 local Tab = Window:CreateTab({
 	Name = "Muscle Legends",
-	Icon = "fitness_center", -- Ikona z Material Icons
+	Icon = "fitness_center",
 	ImageSource = "Material",
 	ShowTitle = true
 })
 
-Tab:CreateSection("Automatyzacja")
+Tab:CreateSection("Automatyzacja Treningu")
 
 -- AUTO TRAIN
-local TrainToggle = Tab:CreateToggle({
+Tab:CreateToggle({
 	Name = "Auto-LPM (Trening)",
 	CurrentValue = false,
 	Callback = function(Value)
@@ -65,12 +67,12 @@ local TrainToggle = Tab:CreateToggle({
 	end
 }, "AutoTrainFlag")
 
-Tab:CreateSection("Ochrona AFK")
+Tab:CreateSection("Ochrona (Dla Rebirth Scriptów)")
 
 -- KLATKA + AUTO TELEPORT BACK
-local FortressToggle = Tab:CreateToggle({
-	Name = "Klatka + Auto-TP Back",
-	Description = "Buduje klatkę i tepa Cię do niej jeśli ktoś Cię wyrzuci",
+Tab:CreateToggle({
+	Name = "Forteca + Anti-Fling",
+	Description = "Tworzy klatkę i tepuje Cię do niej, jeśli ktoś Cię wyrzuci",
 	CurrentValue = false,
 	Callback = function(Value)
 		getgenv().FortressActive = Value
@@ -96,20 +98,20 @@ local FortressToggle = Tab:CreateToggle({
 				wall.CFrame = cframe
 			end
 
-			-- Budowanie klatki
+			-- Budowanie bezpiecznej strefy
 			CreateWall("F", getgenv().SavedPos * CFrame.new(0, 5, -7))
 			CreateWall("B", getgenv().SavedPos * CFrame.new(0, 5, 7))
 			CreateWall("L", getgenv().SavedPos * CFrame.new(-7, 5, 0) * CFrame.Angles(0, math.rad(90), 0))
 			CreateWall("R", getgenv().SavedPos * CFrame.new(7, 5, 0) * CFrame.Angles(0, math.rad(90), 0))
 			CreateWall("Roof", getgenv().SavedPos * CFrame.new(0, 12, 0) * CFrame.Angles(math.rad(90), 0, 0), Vector3.new(15, 15, 1))
 
-			-- Pętla Auto-TP
+			-- Logika Auto-Powrotu
 			task.spawn(function()
 				while getgenv().FortressActive do
 					if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
 						local root = LP.Character.HumanoidRootPart
 						local dist = (root.Position - getgenv().SavedPos.Position).Magnitude
-						if dist > 10 then
+						if dist > 11 then -- Zwiększyłem o 1 stud marginesu
 							root.CFrame = getgenv().SavedPos
 						end
 					end
@@ -121,11 +123,10 @@ local FortressToggle = Tab:CreateToggle({
 	end
 }, "FortressFlag")
 
-Tab:CreateSection("Statystyki")
+Tab:CreateSection("Postać")
 
--- WALK SPEED SLIDER
-local SpeedSlider = Tab:CreateSlider({
-	Name = "WalkSpeed",
+Tab:CreateSlider({
+	Name = "Szybkość (WalkSpeed)",
 	Range = {16, 500},
 	Increment = 5,
 	CurrentValue = 16,
@@ -136,9 +137,9 @@ local SpeedSlider = Tab:CreateSlider({
 	end
 }, "SpeedFlag")
 
--- [[ DODATKI ]] --
+-- [[ KONFIGURACJA ]] --
 local ConfigTab = Window:CreateTab({
-	Name = "Ustawienia",
+	Name = "Config",
 	Icon = "settings",
 	ImageSource = "Material",
 	ShowTitle = true
@@ -157,8 +158,8 @@ task.spawn(function()
 end)
 
 Luna:Notification({
-	Title = "Banana Hub Załadowany!",
-	Icon = "check_circle",
+	Title = "Banana Hub Gotowy!",
+	Icon = "verified",
 	ImageSource = "Material",
-	Content = "Użyj klatki, aby bezpiecznie auto-rebirthować."
+	Content = "Gra zweryfikowana: Muscle Legends."
 })
