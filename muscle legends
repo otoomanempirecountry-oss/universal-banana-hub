@@ -1,0 +1,158 @@
+local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/master/source.lua", true))()
+
+-- [[ KONFIGURACJA OKNA ]] --
+local Window = Luna:CreateWindow({
+	Name = "Banana Hub 🍌",
+	Subtitle = "Muscle Legends Edition",
+	LogoID = "nil", -- Możesz wkleić ID logo jeśli masz
+	LoadingEnabled = true,
+	LoadingTitle = "Banana Hub v5",
+	LoadingSubtitle = "by Gemini AI",
+
+	ConfigSettings = {
+		ConfigFolder = "BananaHubML"
+	},
+
+	KeySystem = false -- Wyłączyłem klucz, żebyś mógł od razu odpalać
+})
+
+-- [[ HOME TAB ]] --
+Window:CreateHomeTab({
+	SupportedExecutors = {"All"},
+	DiscordInvite = "banana", -- Tu możesz wpisać swój discord
+	Icon = 1
+})
+
+-- [[ ZMIENNE ]] --
+local LP = game:GetService("Players").LocalPlayer
+local VIM = game:GetService("VirtualInputManager")
+getgenv().AutoTrain = false
+getgenv().FortressActive = false
+getgenv().SavedPos = nil
+
+-- [[ ZAKŁADKA GŁÓWNA ]] --
+local Tab = Window:CreateTab({
+	Name = "Muscle Legends",
+	Icon = "fitness_center", -- Ikona z Material Icons
+	ImageSource = "Material",
+	ShowTitle = true
+})
+
+Tab:CreateSection("Automatyzacja")
+
+-- AUTO TRAIN
+local TrainToggle = Tab:CreateToggle({
+	Name = "Auto-LPM (Trening)",
+	CurrentValue = false,
+	Callback = function(Value)
+		getgenv().AutoTrain = Value
+		if Value then
+			task.spawn(function()
+				while getgenv().AutoTrain do
+					VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+					task.wait()
+					VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+					task.wait(0.12)
+				end
+			end)
+		end
+	end
+}, "AutoTrainFlag")
+
+Tab:CreateSection("Ochrona AFK")
+
+-- KLATKA + AUTO TELEPORT BACK
+local FortressToggle = Tab:CreateToggle({
+	Name = "Klatka + Auto-TP Back",
+	Description = "Buduje klatkę i tepa Cię do niej jeśli ktoś Cię wyrzuci",
+	CurrentValue = false,
+	Callback = function(Value)
+		getgenv().FortressActive = Value
+		
+		if Value then
+			local char = LP.Character
+			if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+			
+			getgenv().SavedPos = char.HumanoidRootPart.CFrame 
+			
+			local folder = Instance.new("Folder", workspace)
+			folder.Name = "BananaFortress"
+			
+			local function CreateWall(name, cframe, size)
+				local wall = Instance.new("Part", folder)
+				wall.Name = name
+				wall.Size = size or Vector3.new(15, 15, 1)
+				wall.Transparency = 0.5
+				wall.Color = Color3.fromRGB(255, 255, 0)
+				wall.Material = Enum.Material.ForceField
+				wall.Anchored = true
+				wall.CanCollide = true
+				wall.CFrame = cframe
+			end
+
+			-- Budowanie klatki
+			CreateWall("F", getgenv().SavedPos * CFrame.new(0, 5, -7))
+			CreateWall("B", getgenv().SavedPos * CFrame.new(0, 5, 7))
+			CreateWall("L", getgenv().SavedPos * CFrame.new(-7, 5, 0) * CFrame.Angles(0, math.rad(90), 0))
+			CreateWall("R", getgenv().SavedPos * CFrame.new(7, 5, 0) * CFrame.Angles(0, math.rad(90), 0))
+			CreateWall("Roof", getgenv().SavedPos * CFrame.new(0, 12, 0) * CFrame.Angles(math.rad(90), 0, 0), Vector3.new(15, 15, 1))
+
+			-- Pętla Auto-TP
+			task.spawn(function()
+				while getgenv().FortressActive do
+					if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+						local root = LP.Character.HumanoidRootPart
+						local dist = (root.Position - getgenv().SavedPos.Position).Magnitude
+						if dist > 10 then
+							root.CFrame = getgenv().SavedPos
+						end
+					end
+					task.wait(0.1)
+				end
+				if folder then folder:Destroy() end
+			end)
+		end
+	end
+}, "FortressFlag")
+
+Tab:CreateSection("Statystyki")
+
+-- WALK SPEED SLIDER
+local SpeedSlider = Tab:CreateSlider({
+	Name = "WalkSpeed",
+	Range = {16, 500},
+	Increment = 5,
+	CurrentValue = 16,
+	Callback = function(Value)
+		if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+			LP.Character.Humanoid.WalkSpeed = Value
+		end
+	end
+}, "SpeedFlag")
+
+-- [[ DODATKI ]] --
+local ConfigTab = Window:CreateTab({
+	Name = "Ustawienia",
+	Icon = "settings",
+	ImageSource = "Material",
+	ShowTitle = true
+})
+
+ConfigTab:BuildConfigSection()
+
+-- Anti-AFK
+task.spawn(function()
+    while true do
+        task.wait(300)
+        VIM:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+        task.wait(0.1)
+        VIM:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    end
+end)
+
+Luna:Notification({
+	Title = "Banana Hub Załadowany!",
+	Icon = "check_circle",
+	ImageSource = "Material",
+	Content = "Użyj klatki, aby bezpiecznie auto-rebirthować."
+})
