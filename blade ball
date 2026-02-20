@@ -1,0 +1,77 @@
+
+
+
+-- [[ BANANA HUB - BLADE BALL (LAG COMPENSATOR) ]] --
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🍌 Banana Hub | Blade Ball",
+   LoadingTitle = "Tryb: High Ping (200ms+)",
+   LoadingSubtitle = "Banana Hub vs Lag",
+   ConfigurationSaving = { Enabled = true, FolderName = "BananaHub_BB" },
+   KeySystem = false
+})
+
+local VIM = game:GetService("VirtualInputManager")
+getgenv().SpamF = false
+getgenv().BurstSize = 3 -- Ile kliknięć na jedną serię
+
+local BBTab = Window:CreateTab("Combat ⚔️", nil)
+
+BBTab:CreateSection("Anti-Lag Auto-F")
+
+BBTab:CreateToggle({
+   Name = "SPAM F (Dostosowany pod 200 Pingu)",
+   CurrentValue = false,
+   Callback = function(Value)
+        getgenv().SpamF = Value
+        
+        if Value then
+            task.spawn(function()
+                while getgenv().SpamF do
+                    -- Wysyłamy serię szybkich kliknięć, żeby ominąć lag
+                    for i = 1, getgenv().BurstSize do
+                        VIM:SendKeyEvent(true, Enum.KeyCode.F, false, game)
+                        task.wait(0.005) -- Ekstremalnie szybki burst
+                        VIM:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+                    end
+                    -- Mała przerwa między seriami, żeby serwer Cię nie zbanował
+                    task.wait(0.02) 
+                end
+            end)
+            Rayfield:Notify({Title = "Banana Hub", Content = "Tryb Lag-Killer aktywny!"})
+        end
+   end,
+})
+
+BBTab:CreateSlider({
+   Name = "Siła Serii (Burst Size)",
+   Range = {1, 10},
+   Increment = 1,
+   Suffix = "kliknięć",
+   CurrentValue = 3,
+   Callback = function(Value)
+        getgenv().BurstSize = Value
+   end,
+})
+
+BBTab:CreateSection("Ustawienia dla Lagów")
+
+BBTab:CreateLabel("Przy 200 pingu ustaw Burst Size na 4-6.")
+BBTab:CreateLabel("To wyśle kilka 'F' naraz, zwiększając szansę na trafienie.")
+
+-- FPS Boost jest KLUCZOWY przy lagu
+BBTab:CreateButton({
+    Name = "Maximum FPS Boost (Kluczowe przy lagu)",
+    Callback = function()
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("BasePart") then 
+                v.Material = Enum.Material.SmoothPlastic 
+                v.CastShadow = false
+            end
+            if v:IsA("Decal") or v:IsA("Texture") then v:Destroy() end
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") then v.Enabled = false end
+        end
+        settings().Rendering.QualityLevel = 1
+    end
+})
