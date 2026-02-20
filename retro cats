@@ -1,0 +1,110 @@
+-- [[ 🍌 BANANA HUB PRIVATE | RETRO CATS - MANUAL INSTANT INTERACT & ANCHOR 🍌 ]] --
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+   Name = "🍌 BANANA HUB | RETRO CATS",
+   LoadingTitle = "Konfiguracja Manual Interact...",
+   ConfigurationSaving = { Enabled = false }
+})
+
+local LP = game.Players.LocalPlayer
+local RS = game:GetService("RunService")
+local TeleportPos = nil
+_G.InTravel = false
+_G.AntiKnockback = true
+_G.InstantInteractManual = true -- Natychmiastowe, ale ręczne
+
+-- [[ 1. MODUŁ MANUAL INSTANT INTERACT (BEZ AUTO-COLLECT) ]] --
+-- Skrypt tylko zmienia właściwości przedmiotów, żeby zbierały się w 0 sekund
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G.InstantInteractManual then
+            pcall(function()
+                for _, v in pairs(workspace:GetDescendants()) do
+                    if v:IsA("ProximityPrompt") then
+                        v.HoldDuration = 0 -- Zbierasz natychmiast po kliknięciu "E"
+                        -- v.MaxActivationDistance = 10 -- Standardowy zasięg (nie zmieniam na wielki, żeby było legit)
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- [[ 2. ANTI-KNOCKBACK GOD MODE (ŻEBY KOTY CIĘ NIE WYWALIŁY) ]] --
+RS.Heartbeat:Connect(function()
+    if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = LP.Character.HumanoidRootPart
+        if _G.AntiKnockback or _G.InTravel then
+            -- Resetujemy pęd nadany przez koty
+            hrp.Velocity = Vector3.new(0, 0, 0)
+            hrp.RotVelocity = Vector3.new(0, 0, 0)
+        end
+    end
+end)
+
+-- [[ 3. STABILNY LOT (FIXED FLY) ]] --
+local function SecureMove(targetCFrame)
+    local char = LP.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChild("Humanoid")
+    if not hrp or not hum then return end
+
+    local speed = 4 
+    local distance = (hrp.Position - targetCFrame.Position).Magnitude
+    local steps = math.floor(distance / speed)
+    hum.PlatformStand = true 
+    
+    for i = 1, steps do
+        if not _G.InTravel then break end
+        hrp.Velocity = Vector3.new(0, 0, 0)
+        hrp.CFrame = hrp.CFrame:Lerp(targetCFrame, i / steps)
+        RS.Heartbeat:Wait()
+    end
+    hrp.CFrame = targetCFrame
+end
+
+local function StartFlight()
+    if not TeleportPos then return end
+    _G.InTravel = true
+    local upPos = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 60, 0)
+    SecureMove(upPos)
+    SecureMove(CFrame.new(TeleportPos.X, upPos.Y, TeleportPos.Z))
+    SecureMove(TeleportPos)
+    LP.Character.Humanoid.PlatformStand = false
+    _G.InTravel = false
+end
+
+-- [[ ZAKŁADKI UI ]] --
+local MainTab = Window:CreateTab("God Mode & Interact 🐱")
+
+MainTab:CreateToggle({
+   Name = "Instant Interact (Manual)",
+   CurrentValue = true,
+   Callback = function(v) _G.InstantInteractManual = v end
+})
+
+MainTab:CreateToggle({
+   Name = "Anti-Knockback (Blokada Odrzutu)",
+   CurrentValue = true,
+   Callback = function(v) _G.AntiKnockback = v end
+})
+
+local FlyTab = Window:CreateTab("Travel ✈️")
+
+FlyTab:CreateButton({
+   Name = "Zapisz Punkt (Mark)",
+   Callback = function()
+       if LP.Character then TeleportPos = LP.Character.HumanoidRootPart.CFrame end
+       Rayfield:Notify({Title = "Zapisano", Content = "Punkt docelowy ustawiony! 📍"})
+   end
+})
+
+FlyTab:CreateButton({
+   Name = "Bezpieczny Lot do Celu",
+   Callback = function()
+       task.spawn(StartFlight)
+   end
+})
+
+Rayfield:Notify({Title = "BANANA HUB", Content = "Manual Interact & Anti-Fling Gotowy! 🍌"})
