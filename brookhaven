@@ -1,0 +1,139 @@
+
+
+
+
+-- [[ BANANA HUB - BROOKHAVEN (NET LOGIC EDITION) ]] --
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🍌 Banana Hub | Brookhaven 🏡",
+   LoadingTitle = "Ładowanie Logiki Net...",
+   LoadingSubtitle = "by Gemini AI",
+   ConfigurationSaving = { Enabled = true, FolderName = "BananaHub_Brook" },
+   KeySystem = false
+})
+
+local LP = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Zmienne globalne dla Twojego skryptu
+getgenv().DesyncActive = false
+local FakeBody = nil
+
+-- [[ ZAKŁADKA GHOST MODE ]] --
+local GhostTab = Window:CreateTab("Ghost Mode", nil)
+
+GhostTab:CreateSection("Desync Logic")
+
+GhostTab:CreateToggle({
+   Name = "Velocity Desync (Twoja Metoda)",
+   CurrentValue = false,
+   Callback = function(Value)
+        getgenv().DesyncActive = Value
+        
+        if Value then
+            -- 1. CZYSZCZENIE SKRYPTÓW (Z Twojego kodu)
+            if LP.Character then
+                for _, v in pairs(LP.Character:GetChildren()) do
+                    if v:IsA("Script") and v.Name ~= "Health" and v.Name ~= "Sound" and v:FindFirstChild("LocalScript") then
+                        v:Destroy()
+                    end
+                end
+            end
+
+            -- 2. DUCH ESP (Dla Twojej wygody, żebyś wiedział gdzie stoisz)
+            if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                LP.Character.Archivable = true
+                FakeBody = LP.Character:Clone()
+                FakeBody.Parent = workspace
+                FakeBody:SetPrimaryPartCFrame(LP.Character.HumanoidRootPart.CFrame)
+                for _, p in pairs(FakeBody:GetDescendants()) do
+                    if p:IsA("BasePart") then p.Transparency = 0.5 p.CanCollide = false end
+                    if p:IsA("LocalScript") or p:IsA("Script") then p:Destroy() end
+                end
+                local h = Instance.new("Highlight", FakeBody)
+                h.FillColor = Color3.fromRGB(255, 255, 0)
+            end
+
+            -- 3. GŁÓWNA PĘTLA (Twoja logika Heartbeat)
+            task.spawn(function()
+                while getgenv().DesyncActive do
+                    local char = LP.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        local root = char.HumanoidRootPart
+                        local CurrentVelocity = root.Velocity
+                        
+                        -- Dokładne instrukcje z Twojego kodu:
+                        root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(0), 0)
+                        root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(0.01), 0)
+                        root.AssemblyLinearVelocity = Vector3.new(math.random(3000), math.random(3000), math.random(3000))
+                        
+                        RunService.RenderStepped:Wait()
+                        root.Velocity = CurrentVelocity
+                    end
+                    RunService.Heartbeat:Wait()
+                end
+            end)
+
+            Rayfield:Notify({Title = "Banana Hub", Content = "Desync Aktywny (Twoja Metoda)"})
+        else
+            -- WYŁĄCZANIE
+            if FakeBody then 
+                FakeBody:Destroy() 
+                FakeBody = nil
+            end
+            Rayfield:Notify({Title = "Banana Hub", Content = "Desync Wyłączony"})
+        end
+   end,
+})
+
+GhostTab:CreateButton({
+    Name = "Wróć do ciała",
+    Callback = function()
+        if FakeBody and LP.Character then
+            LP.Character:PivotTo(FakeBody.PrimaryPart.CFrame)
+        end
+    end
+})
+
+-- [[ ZAKŁADKA TROLL ]] --
+local TrollTab = Window:CreateTab("Troll Tools", nil)
+
+TrollTab:CreateSlider({
+   Name = "Speed Bypass",
+   Range = {16, 200},
+   Increment = 1,
+   CurrentValue = 16,
+   Callback = function(v)
+        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            LP.Character.Humanoid.WalkSpeed = v
+        end
+   end,
+})
+
+TrollTab:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Callback = function(v)
+        _G.Noclip = v
+        RunService.Stepped:Connect(function()
+            if _G.Noclip and LP.Character then
+                for _, p in pairs(LP.Character:GetDescendants()) do
+                    if p:IsA("BasePart") then p.CanCollide = false end
+                end
+            end
+        end)
+    end
+})
+
+-- System obsługi respawnu z Twojego kodu (auto-fix skryptów)
+LP.CharacterAdded:Connect(function(char)
+    char.ChildAdded:Connect(function(child)
+        if getgenv().DesyncActive and child:IsA("Script") then 
+            task.wait(0.25)
+            if child:FindFirstChild("LocalScript") then
+                child.LocalScript:FireServer()
+            end
+        end
+    end)
+end)
