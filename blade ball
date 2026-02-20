@@ -1,27 +1,32 @@
+-- [[ SPRAWDZANIE PLACE ID (BLADE BALL) ]] --
+if game.PlaceId ~= 13772394625 then
+    warn("Banana Hub: To nie jest Blade Ball!")
+    return 
+end
 
-
-
--- [[ BANANA HUB - BLADE BALL (LAG COMPENSATOR) ]] --
+-- [[ ŁADOWANIE RAYFIELDA ]] --
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "🍌 Banana Hub | Blade Ball",
-   LoadingTitle = "Tryb: High Ping (200ms+)",
-   LoadingSubtitle = "Banana Hub vs Lag",
-   ConfigurationSaving = { Enabled = true, FolderName = "BananaHub_BB" },
+   LoadingTitle = "Tryb: High Ping (Rayfield Fix)",
+   LoadingSubtitle = "Stabilny Auto-F",
+   ConfigurationSaving = { Enabled = true, FolderName = "BananaHub_BB_Ray" },
    KeySystem = false
 })
 
+-- [[ ZMIENNE ]] --
 local VIM = game:GetService("VirtualInputManager")
 getgenv().SpamF = false
-getgenv().BurstSize = 3 -- Ile kliknięć na jedną serię
+getgenv().BurstSize = 3 -- Domyślnie 3 kliknięcia
 
+-- [[ ZAKŁADKA COMBAT ]] --
 local BBTab = Window:CreateTab("Combat ⚔️", nil)
 
 BBTab:CreateSection("Anti-Lag Auto-F")
 
 BBTab:CreateToggle({
-   Name = "SPAM F (Dostosowany pod 200 Pingu)",
+   Name = "SPAM F (Burst Mode)",
    CurrentValue = false,
    Callback = function(Value)
         getgenv().SpamF = Value
@@ -29,23 +34,22 @@ BBTab:CreateToggle({
         if Value then
             task.spawn(function()
                 while getgenv().SpamF do
-                    -- Wysyłamy serię szybkich kliknięć, żeby ominąć lag
+                    -- Rayfieldowa pętla bursta
                     for i = 1, getgenv().BurstSize do
                         VIM:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-                        task.wait(0.005) -- Ekstremalnie szybki burst
+                        task.wait(0.005)
                         VIM:SendKeyEvent(false, Enum.KeyCode.F, false, game)
                     end
-                    -- Mała przerwa między seriami, żeby serwer Cię nie zbanował
-                    task.wait(0.02) 
+                    task.wait(0.02) -- Przerwa dla stabilności przy wysokim pingu
                 end
             end)
-            Rayfield:Notify({Title = "Banana Hub", Content = "Tryb Lag-Killer aktywny!"})
+            Rayfield:Notify({Title = "Banana Hub", Content = "Auto-F włączony na Rayfieldzie!"})
         end
    end,
 })
 
 BBTab:CreateSlider({
-   Name = "Siła Serii (Burst Size)",
+   Name = "Burst Size (Siła kliknięć)",
    Range = {1, 10},
    Increment = 1,
    Suffix = "kliknięć",
@@ -55,14 +59,12 @@ BBTab:CreateSlider({
    end,
 })
 
-BBTab:CreateSection("Ustawienia dla Lagów")
+BBTab:CreateSection("Ustawienia pod 200ms Ping")
 
-BBTab:CreateLabel("Przy 200 pingu ustaw Burst Size na 4-6.")
-BBTab:CreateLabel("To wyśle kilka 'F' naraz, zwiększając szansę na trafienie.")
+BBTab:CreateLabel("Ustaw Burst na 5, jeśli piłka Cię przenika.")
 
--- FPS Boost jest KLUCZOWY przy lagu
 BBTab:CreateButton({
-    Name = "Maximum FPS Boost (Kluczowe przy lagu)",
+    Name = "FPS Boost (Zmniejsza Input Lag)",
     Callback = function()
         for _, v in pairs(workspace:GetDescendants()) do
             if v:IsA("BasePart") then 
@@ -73,5 +75,15 @@ BBTab:CreateButton({
             if v:IsA("ParticleEmitter") or v:IsA("Trail") then v.Enabled = false end
         end
         settings().Rendering.QualityLevel = 1
+        Rayfield:Notify({Title = "Banana Hub", Content = "Grafika uproszczona!"})
     end
 })
+
+-- Anti-AFK
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+Rayfield:Notify({Title = "Banana Hub", Content = "Blade Ball załadowany poprawnie!"})
