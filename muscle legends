@@ -1,3 +1,9 @@
+
+local PlaceId = game.PlaceId
+
+-- Sprawdzamy ID gry na samym początku
+if PlaceId == 3623096087 then
+
 local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/master/source.lua", true))()
 
 -- [[ KONFIGURACJA OKNA ]] --
