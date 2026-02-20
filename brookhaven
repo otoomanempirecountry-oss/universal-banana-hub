@@ -1,38 +1,61 @@
+-- [[ SPRAWDZANIE PLACE ID ]] --
+local targetPlaceId = 4924922222
 
+if game.PlaceId ~= targetPlaceId then
+    warn("Banana Hub: To nie jest Brookhaven! Skrypt nie został załadowany.")
+    return 
+end
 
+-- [[ ŁADOWANIE LUNY ]] --
+local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/master/source.lua", true))()
 
+local Window = Luna:CreateWindow({
+	Name = "Banana Hub 🍌",
+	Subtitle = "Brookhaven Edition",
+	LogoID = "nil",
+	LoadingEnabled = true,
+	LoadingTitle = "Weryfikacja Net Logic...",
+	LoadingSubtitle = "Brookhaven Wykryte!",
 
--- [[ BANANA HUB - BROOKHAVEN (NET LOGIC EDITION) ]] --
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+	ConfigSettings = {
+		ConfigFolder = "BananaHubBrook"
+	},
 
-local Window = Rayfield:CreateWindow({
-   Name = "🍌 Banana Hub | Brookhaven 🏡",
-   LoadingTitle = "Ładowanie Logiki Net...",
-   LoadingSubtitle = "by Gemini AI",
-   ConfigurationSaving = { Enabled = true, FolderName = "BananaHub_Brook" },
-   KeySystem = false
+	KeySystem = false
 })
 
+-- [[ HOME TAB ]] --
+Window:CreateHomeTab({
+	SupportedExecutors = {"All"},
+	DiscordInvite = "banana",
+	Icon = 1
+})
+
+-- [[ ZMIENNE ]] --
 local LP = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
-
--- Zmienne globalne dla Twojego skryptu
 getgenv().DesyncActive = false
 local FakeBody = nil
 
 -- [[ ZAKŁADKA GHOST MODE ]] --
-local GhostTab = Window:CreateTab("Ghost Mode", nil)
+local Tab = Window:CreateTab({
+	Name = "Ghost Mode",
+	Icon = "visibility_off",
+	ImageSource = "Material",
+	ShowTitle = true
+})
 
-GhostTab:CreateSection("Desync Logic")
+Tab:CreateSection("Velocity Desync")
 
-GhostTab:CreateToggle({
-   Name = "Velocity Desync (Twoja Metoda)",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().DesyncActive = Value
+Tab:CreateToggle({
+	Name = "Velocity Desync (Net Logic)",
+	Description = "Twoja metoda na 'Invisible Walk'",
+	CurrentValue = false,
+	Callback = function(Value)
+		getgenv().DesyncActive = Value
         
         if Value then
-            -- 1. CZYSZCZENIE SKRYPTÓW (Z Twojego kodu)
+            -- 1. Czyszczenie skryptów (Twoja metoda)
             if LP.Character then
                 for _, v in pairs(LP.Character:GetChildren()) do
                     if v:IsA("Script") and v.Name ~= "Health" and v.Name ~= "Sound" and v:FindFirstChild("LocalScript") then
@@ -41,7 +64,7 @@ GhostTab:CreateToggle({
                 end
             end
 
-            -- 2. DUCH ESP (Dla Twojej wygody, żebyś wiedział gdzie stoisz)
+            -- 2. Duch ESP
             if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
                 LP.Character.Archivable = true
                 FakeBody = LP.Character:Clone()
@@ -55,7 +78,7 @@ GhostTab:CreateToggle({
                 h.FillColor = Color3.fromRGB(255, 255, 0)
             end
 
-            -- 3. GŁÓWNA PĘTLA (Twoja logika Heartbeat)
+            -- 3. Główna pętla
             task.spawn(function()
                 while getgenv().DesyncActive do
                     local char = LP.Character
@@ -63,10 +86,8 @@ GhostTab:CreateToggle({
                         local root = char.HumanoidRootPart
                         local CurrentVelocity = root.Velocity
                         
-                        -- Dokładne instrukcje z Twojego kodu:
-                        root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(0), 0)
                         root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(0.01), 0)
-                        root.AssemblyLinearVelocity = Vector3.new(math.random(3000), math.random(3000), math.random(3000))
+                        root.AssemblyLinearVelocity = Vector3.new(math.random(3000, 5000), math.random(3000, 5000), math.random(3000, 5000))
                         
                         RunService.RenderStepped:Wait()
                         root.Velocity = CurrentVelocity
@@ -74,59 +95,59 @@ GhostTab:CreateToggle({
                     RunService.Heartbeat:Wait()
                 end
             end)
-
-            Rayfield:Notify({Title = "Banana Hub", Content = "Desync Aktywny (Twoja Metoda)"})
+            
+            Luna:Notification({Title = "Banana Hub", Content = "Desync Aktywny!"})
         else
-            -- WYŁĄCZANIE
-            if FakeBody then 
-                FakeBody:Destroy() 
-                FakeBody = nil
-            end
-            Rayfield:Notify({Title = "Banana Hub", Content = "Desync Wyłączony"})
+            if FakeBody then FakeBody:Destroy() FakeBody = nil end
         end
-   end,
-})
+	end
+}, "DesyncFlag")
 
-GhostTab:CreateButton({
-    Name = "Wróć do ciała",
-    Callback = function()
-        if FakeBody and LP.Character then
+Tab:CreateButton({
+	Name = "Wróć do ciała",
+	Callback = function()
+		if FakeBody and LP.Character then
             LP.Character:PivotTo(FakeBody.PrimaryPart.CFrame)
         end
-    end
+	end
 })
 
 -- [[ ZAKŁADKA TROLL ]] --
-local TrollTab = Window:CreateTab("Troll Tools", nil)
+local TrollTab = Window:CreateTab({
+	Name = "Troll Tools",
+	Icon = "mood_bad",
+	ImageSource = "Material",
+	ShowTitle = true
+})
 
 TrollTab:CreateSlider({
-   Name = "Speed Bypass",
-   Range = {16, 200},
-   Increment = 1,
-   CurrentValue = 16,
-   Callback = function(v)
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+	Name = "Speed Bypass",
+	Range = {16, 200},
+	Increment = 1,
+	CurrentValue = 16,
+	Callback = function(v)
+		if LP.Character and LP.Character:FindFirstChild("Humanoid") then
             LP.Character.Humanoid.WalkSpeed = v
         end
-   end,
-})
+	end
+}, "SpeedFlag")
 
 TrollTab:CreateToggle({
     Name = "Noclip",
     CurrentValue = false,
     Callback = function(v)
-        _G.Noclip = v
+        getgenv().Noclip = v
         RunService.Stepped:Connect(function()
-            if _G.Noclip and LP.Character then
+            if getgenv().Noclip and LP.Character then
                 for _, p in pairs(LP.Character:GetDescendants()) do
                     if p:IsA("BasePart") then p.CanCollide = false end
                 end
             end
         end)
     end
-})
+}, "NoclipFlag")
 
--- System obsługi respawnu z Twojego kodu (auto-fix skryptów)
+-- Obsługa respawnu (Twoja logika Net)
 LP.CharacterAdded:Connect(function(char)
     char.ChildAdded:Connect(function(child)
         if getgenv().DesyncActive and child:IsA("Script") then 
@@ -137,3 +158,10 @@ LP.CharacterAdded:Connect(function(char)
         end
     end)
 end)
+
+Luna:Notification({
+	Title = "Banana Hub Gotowy!",
+	Icon = "home",
+	ImageSource = "Material",
+	Content = "Gra zweryfikowana: Brookhaven."
+})
