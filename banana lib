@@ -1,4 +1,4 @@
--- [[ 🍌 BANANA LIB V10 - TOXIC NEON EDITION ]] --
+-- [[ 🍌 BANANA LIB V11 - ULTRA NEON EDITION ]] --
 local BananaLib = {}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -6,168 +6,108 @@ local RunService = game:GetService("RunService")
 
 function BananaLib:CreateWindow(Config)
     local UI = Instance.new("ScreenGui", game:GetService("CoreGui"))
-    UI.Name = "Banana_Toxic_V10"
+    UI.Name = "Banana_V11_Ultra"
 
-    -- [[ SPLASH SCREEN - 5 SEKUND ]] --
-    local Splash = Instance.new("Frame", UI)
-    Splash.Size = UDim2.new(1, 0, 1, 0)
-    Splash.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Czysta czerń
-    Splash.ZIndex = 10
+    -- [[ 1. AGRESYWNY SPLASH SCREEN ]] --
+    local SplashFrame = Instance.new("Frame", UI)
+    SplashFrame.Size = UDim2.new(1, 0, 1, 0)
+    SplashFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    SplashFrame.ZIndex = 100
+
+    local SplashLogo = Instance.new("TextLabel", SplashFrame)
+    SplashLogo.Size = UDim2.new(1, 0, 1, 0)
+    SplashLogo.Text = "BANANA HUB"
+    SplashLogo.TextColor3 = Color3.fromRGB(255, 230, 0)
+    SplashLogo.Font = Enum.Font.GothamBold
+    SplashLogo.TextSize = 60
+    SplashLogo.TextTransparency = 1
     
-    local SplashText = Instance.new("TextLabel", Splash)
-    SplashText.Size = UDim2.new(1, 0, 1, 0)
-    SplashText.Text = "BANANA HUB"
-    SplashText.TextColor3 = Color3.fromRGB(255, 230, 0) -- Intensywny żółty
-    SplashText.Font = Enum.Font.GothamBold
-    SplashText.TextSize = 50
-    SplashText.BackgroundTransparency = 1
-    SplashText.TextTransparency = 1
+    local Glow = Instance.new("UIStroke", SplashLogo)
+    Glow.Color = Color3.fromRGB(255, 230, 0)
+    Glow.Thickness = 4
+    Glow.Transparency = 1
 
-    -- Animacja wjazdu napisu
-    TweenService:Create(SplashText, TweenInfo.new(1.5), {TextTransparency = 0, TextSize = 60}):Play()
-    task.wait(4)
-    TweenService:Create(Splash, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(SplashText, TweenInfo.new(1), {TextTransparency = 1}):Play()
-    task.delay(1, function() Splash:Destroy() end)
+    -- Animacja Splash
+    task.spawn(function()
+        TweenService:Create(SplashLogo, TweenInfo.new(1), {TextTransparency = 0}):Play()
+        TweenService:Create(Glow, TweenInfo.new(1), {Transparency = 0.5}):Play()
+        task.wait(3)
+        TweenService:Create(SplashLogo, TweenInfo.new(1), {TextSize = 100, TextTransparency = 1}):Play()
+        TweenService:Create(SplashFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+        task.wait(1)
+        SplashFrame:Destroy()
+    end)
 
-    -- [[ GŁÓWNE OKNO ]] --
+    -- [[ 2. GŁÓWNE GUI - FULL NEON ]] --
     local Main = Instance.new("Frame", UI)
-    Main.Size = UDim2.new(0, 550, 0, 350)
-    Main.Position = UDim2.new(0.5, -275, 0.5, -175)
-    Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Czerń
+    Main.Size = UDim2.new(0, 0, 0, 0)
+    Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(5, 5, 5) -- Prawie czarny
     Main.BorderSizePixel = 0
-    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+    Main.ClipsDescendants = true
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
-    -- Neonowa obwódka
-    local NeonStroke = Instance.new("UIStroke", Main)
-    NeonStroke.Color = Color3.fromRGB(255, 230, 0)
-    NeonStroke.Thickness = 3
-    NeonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    local MainStroke = Instance.new("UIStroke", Main)
+    MainStroke.Color = Color3.fromRGB(255, 230, 0)
+    MainStroke.Thickness = 3
+    
+    -- Animacja wejścia (Oczekiwanie na koniec splash)
+    task.delay(4.5, function()
+        Main:TweenSizeAndPosition(UDim2.new(0, 580, 0, 400), UDim2.new(0.5, -290, 0.5, -200), "Out", "Back", 0.7)
+    end)
 
-    -- Sidebar (Czysty żółty z czarnymi ikonami)
     local Sidebar = Instance.new("Frame", Main)
-    Sidebar.Size = UDim2.new(0, 140, 1, 0)
-    Sidebar.BackgroundColor3 = Color3.fromRGB(255, 230, 0)
+    Sidebar.Size = UDim2.new(0, 150, 1, 0)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(255, 230, 0) -- SIDEBAR JEST ŻÓŁTY
     Sidebar.BorderSizePixel = 0
-    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
 
-    local TabScroll = Instance.new("ScrollingFrame", Sidebar)
-    TabScroll.Size = UDim2.new(1, 0, 1, -50)
-    TabScroll.Position = UDim2.new(0, 0, 0, 50)
-    TabScroll.BackgroundTransparency = 1
-    TabScroll.ScrollBarThickness = 0
-    Instance.new("UIListLayout", TabScroll).Padding = UDim.new(0, 10)
+    local Title = Instance.new("TextLabel", Sidebar)
+    Title.Text = "BANANA"; Title.Size = UDim2.new(1,0,0,50); Title.TextColor3 = Color3.fromRGB(0,0,0); Title.Font = Enum.Font.GothamBold; Title.TextSize = 20; Title.BackgroundTransparency = 1
 
     local Container = Instance.new("Frame", Main)
-    Container.Size = UDim2.new(1, -160, 1, -20)
-    Container.Position = UDim2.new(0, 150, 0, 10)
+    Container.Size = UDim2.new(1, -165, 1, -20)
+    Container.Position = UDim2.new(0, 160, 0, 10)
     Container.BackgroundTransparency = 1
 
     local Tabs = {Active = nil}
     function Tabs:CreateTab(Name)
         local Page = Instance.new("ScrollingFrame", Container)
-        Page.Size = UDim2.new(1, 0, 1, 0)
-        Page.BackgroundTransparency = 1
-        Page.Visible = false
-        Page.ScrollBarThickness = 0
-        Instance.new("UIListLayout", Page).Padding = UDim.new(0, 12)
+        Page.Size = UDim2.new(1, 0, 1, 0); Page.BackgroundTransparency = 1; Page.Visible = false; Page.ScrollBarThickness = 0
+        Instance.new("UIListLayout", Page).Padding = UDim.new(0, 10)
 
-        local TBtn = Instance.new("TextButton", TabScroll)
-        TBtn.Size = UDim2.new(1, 0, 0, 40)
-        TBtn.BackgroundTransparency = 1
-        TBtn.Text = Name
-        TBtn.TextColor3 = Color3.fromRGB(0, 0, 0) -- Czarne napisy na żółtym tle
-        TBtn.Font = Enum.Font.GothamBold
-        TBtn.TextSize = 14
+        local TBtn = Instance.new("TextButton", Sidebar)
+        TBtn.Size = UDim2.new(1, 0, 0, 40); TBtn.Position = UDim2.new(0,0,0, #Sidebar:GetChildren()*42 + 20)
+        TBtn.BackgroundTransparency = 1; TBtn.Text = Name; TBtn.TextColor3 = Color3.fromRGB(0,0,0); TBtn.Font = Enum.Font.GothamBold; TBtn.TextSize = 14
 
         TBtn.MouseButton1Click:Connect(function()
             for _, v in pairs(Container:GetChildren()) do v.Visible = false end
             Page.Visible = true
-            for _, v in pairs(TabScroll:GetChildren()) do if v:IsA("TextButton") then v.TextTransparency = 0.5 end end
-            TBtn.TextTransparency = 0
         end)
 
-        if not Tabs.Active then
-            Tabs.Active = true; Page.Visible = true; TBtn.TextTransparency = 0
-        end
+        if not Tabs.Active then Tabs.Active = true; Page.Visible = true end
 
         local Elements = {}
-        
-        -- PRZYCISK (Czarny z żółtym neonem)
         function Elements:CreateButton(Text, Callback)
             local B = Instance.new("TextButton", Page)
-            B.Size = UDim2.new(0.95, 0, 0, 45)
-            B.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-            B.Text = Text
-            B.TextColor3 = Color3.fromRGB(255, 230, 0)
-            B.Font = Enum.Font.GothamBold
-            B.TextSize = 14
-            Instance.new("UICorner", B)
-            local BS = Instance.new("UIStroke", B)
-            BS.Color = Color3.fromRGB(255, 230, 0)
-            BS.Thickness = 1
+            B.Size = UDim2.new(0.95, 0, 0, 40); B.BackgroundColor3 = Color3.fromRGB(0,0,0); B.TextColor3 = Color3.fromRGB(255, 230, 0)
+            B.Text = Text; B.Font = Enum.Font.GothamBold; B.TextSize = 14; Instance.new("UICorner", B)
+            local s = Instance.new("UIStroke", B); s.Color = Color3.fromRGB(255,230,0); s.Thickness = 1
             
-            B.MouseButton1Click:Connect(function()
-                B.BackgroundColor3 = Color3.fromRGB(255, 230, 0)
-                B.TextColor3 = Color3.fromRGB(0, 0, 0)
-                task.wait(0.1)
-                B.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-                B.TextColor3 = Color3.fromRGB(255, 230, 0)
-                Callback()
-            end)
+            B.MouseButton1Click:Connect(Callback)
         end
-
-        -- SLIDER (Full Neon)
-        function Elements:CreateSlider(Name, Min, Max, Start, Callback)
-            local S = Instance.new("Frame", Page)
-            S.Size = UDim2.new(0.95, 0, 0, 60)
-            S.BackgroundTransparency = 1
-            
-            local T = Instance.new("TextLabel", S)
-            T.Text = Name; T.Size = UDim2.new(1, 0, 0, 20); T.TextColor3 = Color3.fromRGB(255, 255, 255); T.Font = Enum.Font.Gotham; T.BackgroundTransparency = 1; T.TextXAlignment = Enum.TextXAlignment.Left
-
-            local Bar = Instance.new("Frame", S)
-            Bar.Size = UDim2.new(1, 0, 0, 8); Bar.Position = UDim2.new(0, 0, 0.7, 0); Bar.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Instance.new("UICorner", Bar)
-
-            local Fill = Instance.new("Frame", Bar)
-            Fill.Size = UDim2.new((Start-Min)/(Max-Min), 0, 1, 0); Fill.BackgroundColor3 = Color3.fromRGB(255, 230, 0); Instance.new("UICorner", Fill)
-            
-            -- Glow effect for fill
-            local FillGlow = Instance.new("UIStroke", Fill)
-            FillGlow.Color = Color3.fromRGB(255, 230, 0)
-            FillGlow.Thickness = 2
-
-            Bar.InputBegan:Connect(function(i)
-                if i.UserInputType == Enum.UserInputType.MouseButton1 then
-                    local con; con = RunService.RenderStepped:Connect(function()
-                        local p = math.clamp((UserInputService:GetMouseLocation().X - Bar.AbsolutePosition.X) / Bar.AbsoluteSize.X, 0, 1)
-                        Fill.Size = UDim2.new(p, 0, 1, 0)
-                        Callback(math.floor(Min + (Max-Min)*p))
-                    end)
-                    UserInputService.InputEnded:Connect(function(i2) if i2.UserInputType == Enum.UserInputType.MouseButton1 then con:Disconnect() end end)
-                end
-            end)
-        end
-
         return Elements
     end
-    
+
     -- Przeciąganie
-    local dragging, dragInput, dragStart, startPos
-    Main.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true; dragStart = input.Position; startPos = Main.Position
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-    Main.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+    local d, di, ds, sp
+    Main.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then d = true; ds = i.Position; sp = Main.Position end end)
+    UserInputService.InputChanged:Connect(function(i) if d and i.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = i.Position - ds
+        Main.Position = UDim2.new(sp.X.Scale, sp.X.Offset + delta.X, sp.Y.Scale, sp.Y.Offset + delta.Y)
+    end end)
+    Main.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then d = false end end)
 
     return Tabs
 end
-
 return BananaLib
