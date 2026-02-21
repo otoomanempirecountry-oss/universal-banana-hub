@@ -1,260 +1,288 @@
--- Banana Interface Library 🍌 by Grok xAI (2026 edition) – miażdży Rayfield
--- loadstring(game:HttpGet("twoj_link_do_pastebina"))()
+-- Banana Interface Library 🍌 v2 – Grok edition (działa 2026)
+-- Pełna libka z splash + UI
 
 local Banana = {}
-Banana.__index = Banana
 
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+local TS = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
 
--- Kolory bananowe 🔥
+-- Kolory banan
 local Theme = {
-    Background = Color3.fromRGB(255, 235, 130),     -- jasny banan
-    Accent    = Color3.fromRGB(255, 190, 50),       -- dojrzały banan
-    Dark      = Color3.fromRGB(180, 120, 0),        -- skórka
-    Text      = Color3.fromRGB(30, 30, 30),
-    Stroke    = Color3.fromRGB(100, 70, 0),
-    GreenTip  = Color3.fromRGB(80, 200, 80),        -- zielony czubek banana xd
+    Bg = Color3.fromRGB(255, 240, 150),
+    Accent = Color3.fromRGB(255, 200, 60),
+    Dark = Color3.fromRGB(200, 140, 0),
+    Text = Color3.fromRGB(40, 30, 10),
+    Green = Color3.fromRGB(100, 220, 80),
 }
 
--- Tworzenie splash screen / logo Banana Team
-local function CreateSplashScreen()
+-- Funkcja splash "Banana Team"
+local function ShowSplash()
     local sg = Instance.new("ScreenGui")
     sg.Name = "BananaSplash"
     sg.IgnoreGuiInset = true
-    sg.Parent = game:GetService("CoreGui")
-    sg.ResetOnSpawn = false
+    sg.Parent = CoreGui
 
-    local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(1,0,1,0)
-    bg.BackgroundColor3 = Color3.fromRGB(20,20,20)
-    bg.Parent = sg
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1,0,1,0)
+    frame.BackgroundColor3 = Color3.fromRGB(10,10,10)
+    frame.Parent = sg
 
-    local logoFrame = Instance.new("Frame")
-    logoFrame.Size = UDim2.new(0, 320, 0, 320)
-    logoFrame.Position = UDim2.new(0.5, -160, 0.5, -160)
-    logoFrame.BackgroundTransparency = 1
-    logoFrame.Parent = bg
+    local logo = Instance.new("TextLabel")
+    logo.Size = UDim2.new(0.4,0,0.2,0)
+    logo.Position = UDim2.new(0.3,0,0.4,0)
+    logo.BackgroundTransparency = 1
+    logo.Text = "🍌 Banana Team 🍌"
+    logo.TextColor3 = Theme.Accent
+    logo.Font = Enum.Font.GothamBlack
+    logo.TextSize = 80
+    logo.TextStrokeTransparency = 0.6
+    logo.TextStrokeColor3 = Color3.new(0,0,0)
+    logo.Parent = frame
 
-    -- Banan logo (prosty kształt z UICorner + gradient)
-    local banana = Instance.new("ImageLabel")
-    banana.Size = UDim2.new(1,0,1,0)
-    banana.BackgroundTransparency = 1
-    banana.Image = "rbxassetid://6031068432"  -- przykładowy banan asset (możesz zmienić na swój)
-    banana.ImageColor3 = Theme.Accent
-    banana.Parent = logoFrame
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(0.5,0,0.1,0)
+    sub.Position = UDim2.new(0.25,0,0.6,0)
+    sub.BackgroundTransparency = 1
+    sub.Text = "Loading the peel... 💛"
+    sub.TextColor3 = Color3.new(1,1,1)
+    sub.Font = Enum.Font.Gotham
+    sub.TextSize = 40
+    sub.Parent = frame
 
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1,0,0.3,0)
-    title.Position = UDim2.new(0,0,1.1,0)
-    title.BackgroundTransparency = 1
-    title.Text = "Banana Team"
-    title.TextColor3 = Theme.Accent
-    title.Font = Enum.Font.GothamBlack
-    title.TextSize = 60
-    title.TextStrokeTransparency = 0.7
-    title.TextStrokeColor3 = Color3.new(0,0,0)
-    title.Parent = logoFrame
+    -- Animka
+    logo.TextTransparency = 1
+    sub.TextTransparency = 1
+    TS:Create(logo, TweenInfo.new(1.5, Enum.EasingStyle.Quint), {TextTransparency = 0}):Play()
+    TS:Create(sub, TweenInfo.new(1.8, Enum.EasingStyle.Quint), {TextTransparency = 0}):Play()
 
-    -- Animacja peelowania / skalowania
-    local tweenInfo = TweenInfo.new(1.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-    
-    banana.Size = UDim2.new(0,0,0,0)
-    TweenService:Create(banana, tweenInfo, {Size = UDim2.new(1,0,1,0)}):Play()
-    
-    title.TextTransparency = 1
-    TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Sine), {TextTransparency = 0}):Play()
-
-    wait(3.2) -- czas na pokazanie logo
-    TweenService:Create(bg, TweenInfo.new(0.8, Enum.EasingStyle.Back), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(logoFrame, TweenInfo.new(0.8), {Position = UDim2.new(0.5, -160, 0.3, -160), Rotation = 15}):Play()
-    
-    task.delay(1, function()
-        sg:Destroy()
-    end)
+    wait(3.5)
+    TS:Create(frame, TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
+    task.delay(1.2, function() sg:Destroy() end)
 end
 
 -- Główne okno
-function Banana:CreateWindow(options)
-    local name = options.Name or "Banana Hub 🍌"
-    
-    -- Najpierw splash
-    CreateSplashScreen()
-    wait(4.2) -- czekamy aż splash zniknie
+function Banana:CreateWindow(title)
+    ShowSplash()  -- najpierw splash
+    wait(4.5)     -- czekamy aż zniknie
 
     local sg = Instance.new("ScreenGui")
     sg.Name = "BananaUI"
-    sg.Parent = game.CoreGui
+    sg.Parent = CoreGui
     sg.ResetOnSpawn = false
 
     local main = Instance.new("Frame")
-    main.Size = UDim2.new(0, 580, 0, 420)
-    main.Position = UDim2.new(0.5, -290, 0.5, -210)
-    main.BackgroundColor3 = Theme.Background
+    main.Name = "Main"
+    main.Size = UDim2.new(0, 520, 0, 380)
+    main.Position = UDim2.new(0.5, -260, 0.5, -190)
+    main.BackgroundColor3 = Theme.Bg
     main.BorderSizePixel = 0
-    main.ClipsDescendants = true
     main.Parent = sg
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
+    corner.CornerRadius = UDim.new(0, 14)
     corner.Parent = main
 
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Theme.Stroke
-    stroke.Thickness = 2.5
-    stroke.Transparency = 0.4
+    stroke.Color = Theme.Dark
+    stroke.Thickness = 2
     stroke.Parent = main
 
-    -- Top bar
+    -- Topbar
     local top = Instance.new("Frame")
-    top.Size = UDim2.new(1,0,0,50)
+    top.Size = UDim2.new(1,0,0,45)
     top.BackgroundColor3 = Theme.Accent
     top.Parent = main
 
     local topCorner = Instance.new("UICorner")
-    topCorner.CornerRadius = UDim.new(0,16)
+    topCorner.CornerRadius = UDim.new(0,14)
     topCorner.Parent = top
 
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(0.6,0,1,0)
-    titleLabel.Position = UDim2.new(0.05,0,0,0)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = name
-    titleLabel.TextColor3 = Color3.new(1,1,1)
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 26
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = top
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1,-60,1,0)
+    lbl.Position = UDim2.new(0,10,0,0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = title or "Banana Hub 🍌"
+    lbl.TextColor3 = Color3.new(1,1,1)
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 24
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = top
 
-    -- Close button (X)
-    local close = Instance.new("TextButton")
-    close.Size = UDim2.new(0,40,0,40)
-    close.Position = UDim2.new(1,-50,0.5,-20)
-    close.BackgroundTransparency = 1
-    close.Text = "X"
-    close.TextColor3 = Color3.new(1,0.2,0.2)
-    close.Font = Enum.Font.GothamBold
-    close.TextSize = 28
-    close.Parent = top
-    
-    close.MouseButton1Click:Connect(function()
-        TweenService:Create(main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0.5, -290, 1.5, 0)}):Play()
-        task.delay(0.5, function() sg:Destroy() end)
+    -- Close X
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0,35,0,35)
+    closeBtn.Position = UDim2.new(1,-45,0,5)
+    closeBtn.BackgroundTransparency = 1
+    closeBtn.Text = "X"
+    closeBtn.TextColor3 = Color3.fromRGB(220,40,40)
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 26
+    closeBtn.Parent = top
+
+    closeBtn.MouseButton1Click:Connect(function()
+        TS:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0.5,-260,1.5,0)}):Play()
+        task.delay(0.6, function() sg:Destroy() end)
     end)
 
-    -- Tab system (prosty na razie)
+    -- Content area
     local content = Instance.new("Frame")
-    content.Size = UDim2.new(1,0,1,-60)
-    content.Position = UDim2.new(0,0,0,60)
+    content.Size = UDim2.new(1,-20,1,-55)
+    content.Position = UDim2.new(0,10,0,50)
     content.BackgroundTransparency = 1
     content.Parent = main
 
-    local layout = Instance.new("UIListLayout")
-    layout.FillDirection = Enum.FillDirection.Vertical
-    layout.Padding = UDim.new(0,12)
-    layout.Parent = content
+    local list = Instance.new("UIListLayout")
+    list.Padding = UDim.new(0,8)
+    list.SortOrder = Enum.SortOrder.LayoutOrder
+    list.Parent = content
 
     local window = {}
-    
-    function window:CreateTab(tabName)
-        local tabButton = Instance.new("TextButton")
-        tabButton.Size = UDim2.new(0.25,0,0,40)
-        tabButton.Position = UDim2.new(0.02 + (#content:GetChildren()-1)*0.26, 0, 0,0) -- proste tabs na górze
-        tabButton.BackgroundColor3 = Theme.Dark
-        tabButton.Text = tabName
-        tabButton.TextColor3 = Color3.new(1,1,1)
-        tabButton.Font = Enum.Font.GothamSemibold
-        tabButton.TextSize = 18
-        tabButton.Parent = top  -- tabs w top bar
 
-        local tabContent = Instance.new("ScrollingFrame")
-        tabContent.Size = UDim2.new(1, -20, 1, -20)
-        tabContent.Position = UDim2.new(0,10,0,10)
-        tabContent.BackgroundTransparency = 1
-        tabContent.CanvasSize = UDim2.new(0,0,0,0)
-        tabContent.ScrollBarThickness = 6
-        tabContent.Visible = false
-        tabContent.Parent = content
-
-        local tabLayout = Instance.new("UIListLayout")
-        tabLayout.Padding = UDim.new(0,10)
-        tabLayout.Parent = tabContent
-
-        tabButton.MouseButton1Click:Connect(function()
-            for _, child in content:GetChildren() do
-                if child:IsA("ScrollingFrame") then child.Visible = false end
-            end
-            tabContent.Visible = true
-        end)
-
-        if #content:GetChildren() == 1 then tabContent.Visible = true end -- pierwszy tab domyślny
-
-        local tab = {}
-        
-        function tab:CreateToggle(opts)
-            local toggle = Instance.new("Frame")
-            toggle.Size = UDim2.new(1,0,0,50)
-            toggle.BackgroundColor3 = Theme.Dark
-            toggle.Parent = tabContent
-
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(0.7,0,1,0)
-            label.BackgroundTransparency = 1
-            label.Text = opts.Name or "Toggle"
-            label.TextColor3 = Theme.Text
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 18
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = toggle
-
-            local indicator = Instance.new("Frame")
-            indicator.Size = UDim2.new(0,40,0,22)
-            indicator.Position = UDim2.new(1,-60,0.5,-11)
-            indicator.BackgroundColor3 = Color3.fromRGB(200,50,50)
-            indicator.Parent = toggle
-
-            local indCorner = Instance.new("UICorner")
-            indCorner.CornerRadius = UDim.new(1,0)
-            indCorner.Parent = indicator
-
-            local enabled = opts.Default or false
-            if enabled then
-                indicator.BackgroundColor3 = Theme.GreenTip
-                indicator.Position = UDim2.new(1,-20,0.5,-11)
-            end
-
-            local clickArea = Instance.new("TextButton")
-            clickArea.Size = UDim2.new(1,0,1,0)
-            clickArea.BackgroundTransparency = 1
-            clickArea.Parent = toggle
-
-            clickArea.MouseButton1Click:Connect(function()
-                enabled = not enabled
-                if enabled then
-                    TweenService:Create(indicator, TweenInfo.new(0.3), {BackgroundColor3 = Theme.GreenTip, Position = UDim2.new(1,-20,0.5,-11)}):Play()
-                else
-                    TweenService:Create(indicator, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(200,50,50), Position = UDim2.new(1,-60,0.5,-11)}):Play()
-                end
-                if opts.Callback then opts.Callback(enabled) end
-            end)
-
-            tabContent.CanvasSize = UDim2.new(0,0,0,tabLayout.AbsoluteContentSize.Y + 20)
-            return toggle
-        end
-
-        -- Dodaj slider, button, dropdown itd. samemu albo powiedz co chcesz – zrobię
-
-        return tab
+    function window:CreateSection(name)
+        local sec = Instance.new("TextLabel")
+        sec.Size = UDim2.new(1,0,0,30)
+        sec.BackgroundTransparency = 1
+        sec.Text = "─── " .. name .. " ───"
+        sec.TextColor3 = Theme.Dark
+        sec.Font = Enum.Font.GothamSemibold
+        sec.TextSize = 18
+        sec.Parent = content
+        return sec
     end
 
-    -- Przykładowe użycie w oknie
-    local Tab1 = window:CreateTab("Main")
-    Tab1:CreateToggle({Name = "God Mode 🍌", Default = false, Callback = function(v) print("God mode: " .. tostring(v)) end})
-    Tab1:CreateToggle({Name = "Speed Hack", Default = true, Callback = function(v) print("Speed: " .. tostring(v)) end})
+    function window:CreateToggle(options)
+        local toggle = Instance.new("Frame")
+        toggle.Size = UDim2.new(1,0,0,40)
+        toggle.BackgroundColor3 = Theme.Dark
+        toggle.Parent = content
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0.75,0,1,0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = options.Name or "Toggle"
+        lbl.TextColor3 = Theme.Text
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextSize = 16
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = toggle
+
+        local box = Instance.new("Frame")
+        box.Size = UDim2.new(0,36,0,20)
+        box.Position = UDim2.new(1,-50,0.5,-10)
+        box.BackgroundColor3 = Color3.fromRGB(180,50,50)
+        box.Parent = toggle
+
+        local boxCorner = Instance.new("UICorner")
+        boxCorner.CornerRadius = UDim.new(1,0)
+        boxCorner.Parent = box
+
+        local state = options.Default or false
+        if state then
+            box.BackgroundColor3 = Theme.Green
+            box.Position = UDim2.new(1,-20,0.5,-10)
+        end
+
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1,0,1,0)
+        btn.BackgroundTransparency = 1
+        btn.Parent = toggle
+
+        btn.MouseButton1Click:Connect(function()
+            state = not state
+            if state then
+                TS:Create(box, TweenInfo.new(0.25), {BackgroundColor3 = Theme.Green, Position = UDim2.new(1,-20,0.5,-10)}):Play()
+            else
+                TS:Create(box, TweenInfo.new(0.25), {BackgroundColor3 = Color3.fromRGB(180,50,50), Position = UDim2.new(1,-50,0.5,-10)}):Play()
+            end
+            if options.Callback then options.Callback(state) end
+        end)
+
+        return toggle
+    end
+
+    -- Dodaj slider (prosty przykład)
+    function window:CreateSlider(options)
+        local slider = Instance.new("Frame")
+        slider.Size = UDim2.new(1,0,0,50)
+        slider.BackgroundColor3 = Theme.Dark
+        slider.Parent = content
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0.6,0,0.4,0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = options.Name or "Slider"
+        lbl.TextColor3 = Theme.Text
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextSize = 16
+        lbl.Parent = slider
+
+        local valueLbl = Instance.new("TextLabel")
+        valueLbl.Size = UDim2.new(0.3,0,0.4,0)
+        valueLbl.Position = UDim2.new(0.7,0,0,0)
+        valueLbl.BackgroundTransparency = 1
+        valueLbl.Text = tostring(options.Default or 50)
+        valueLbl.TextColor3 = Theme.Accent
+        valueLbl.Font = Enum.Font.GothamBold
+        valueLbl.TextSize = 16
+        valueLbl.Parent = slider
+
+        local bar = Instance.new("Frame")
+        bar.Size = UDim2.new(1,-20,0,8)
+        bar.Position = UDim2.new(0,10,0.6,0)
+        bar.BackgroundColor3 = Color3.fromRGB(100,100,100)
+        bar.Parent = slider
+
+        local fill = Instance.new("Frame")
+        fill.Size = UDim2.new(0.5,0,1,0)
+        fill.BackgroundColor3 = Theme.Accent
+        fill.Parent = bar
+
+        local cornerBar = Instance.new("UICorner")
+        cornerBar.CornerRadius = UDim.new(1,0)
+        cornerBar.Parent = bar
+        local fillCorner = Instance.new("UICorner")
+        fillCorner.CornerRadius = UDim.new(1,0)
+        fillCorner.Parent = fill
+
+        -- Prosta interakcja (klik + drag)
+        local dragging = false
+        bar.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+            end
+        end)
+        bar.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = false
+            end
+        end)
+
+        UIS.InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local mousePos = input.Position.X
+                local barAbs = bar.AbsolutePosition.X
+                local barSize = bar.AbsoluteSize.X
+                local rel = math.clamp((mousePos - barAbs) / barSize, 0, 1)
+                local val = math.floor(rel * (options.Max - options.Min) + options.Min)
+                fill.Size = UDim2.new(rel, 0, 1, 0)
+                valueLbl.Text = tostring(val)
+                if options.Callback then options.Callback(val) end
+            end
+        end)
+
+        return slider
+    end
+
+    -- Przykładowe elementy (usuń jak chcesz)
+    window:CreateSection("Main Cheats")
+    window:CreateToggle({Name = "Infinite Jump 🍌", Default = false, Callback = function(v) print("Inf Jump: " .. tostring(v)) end})
+    window:CreateToggle({Name = "No Clip", Default = true})
+    window:CreateSlider({Name = "Walk Speed", Min = 16, Max = 200, Default = 50, Callback = function(v) lp.Character.Humanoid.WalkSpeed = v end})
 
     return window
 end
 
--- Eksport
 return Banana
