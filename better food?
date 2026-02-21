@@ -1,0 +1,201 @@
+-- [[ 🍌 BANANA HUB | PICK BETTER FOOD - ULTIMATE RELIABLE EDITION 🍌 ]] --
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🍌 Banana Hub | Pick Better Food",
+   LoadingTitle = "Banana Hub v4.0 - Permanent Hitbox Fix",
+   LoadingSubtitle = "by Original Yellow",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "BananaHub_Ultimate_Fix"
+   },
+   KeySystem = false
+})
+
+-- ZMIENNE
+local LP = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local HitboxEnabled = false
+local HitboxSize = 35
+local SafeSpeedEnabled = false
+local SpeedValue = 16
+local KillAura = false
+
+-- TABY
+local Main = Window:CreateTab("Automation 🍦", 4483362458)
+local Combat = Window:CreateTab("Giga Arena ⚔️", 4483362458)
+local Player = Window:CreateTab("Safe Mods 🛡️", 4483362458)
+
+-- [[ 🛠️ FUNKCJA NAKŁADANIA HITBOXA (FORCE APPLY) ]] --
+local function ApplyHitbox(v)
+    if v ~= LP and v.Character then
+        local hrp = v.Character:FindFirstChild("HumanoidRootPart")
+        if hrp and HitboxEnabled then
+            pcall(function()
+                -- Zmiana rozmiaru i właściwości
+                hrp.Size = Vector3.new(HitboxSize, HitboxSize, HitboxSize)
+                hrp.Transparency = 0.8
+                hrp.BrickColor = BrickColor.new("Bright yellow")
+                hrp.CanCollide = false
+                hrp.CanTouch = true
+                
+                -- SelectionBox (Wizualizacja zasięgu)
+                local sb = hrp:FindFirstChild("BananaBox")
+                if not sb then
+                    sb = Instance.new("SelectionBox")
+                    sb.Name = "BananaBox"
+                    sb.Adornee = hrp
+                    sb.Parent = hrp
+                end
+                sb.Color3 = Color3.fromRGB(255, 255, 0)
+                sb.Transparency = 0.5
+            end)
+        end
+    end
+end
+
+-- [[ 🛡️ BYPASS SPEED SYSTEM ]] --
+RunService.Stepped:Connect(function()
+    if SafeSpeedEnabled and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+        local Hum = LP.Character:FindFirstChild("Humanoid")
+        if Hum.MoveDirection.Magnitude > 0 then
+            LP.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame + (Hum.MoveDirection * (SpeedValue / 45))
+        end
+    end
+end)
+
+-- [[ ⚙️ SYSTEM CIĄGŁEGO MONITOROWANIA GRACZY ]] --
+task.spawn(function()
+    while true do
+        if HitboxEnabled then
+            for _, v in pairs(game.Players:GetPlayers()) do
+                ApplyHitbox(v)
+            end
+        end
+        task.wait(0.3) -- Bardzo szybkie odświeżanie (3 razy na sekundę)
+    end
+end)
+
+-- Obsługa nowych graczy i respawnów
+game.Players.PlayerAdded:Connect(function(v)
+    v.CharacterAdded:Connect(function(char)
+        task.wait(1) -- Czekamy na załadowanie fizyki postaci
+        if HitboxEnabled then ApplyHitbox(v) end
+    end)
+end)
+
+-- [[ 🍦 AUTOMATION TAB ]] --
+Main:CreateButton({
+   Name = "Platform God Mode (Anti-Fall)",
+   Callback = function()
+      local Part = Instance.new("Part", workspace)
+      Part.Size = Vector3.new(3000, 1, 3000)
+      Part.Position = Vector3.new(0, -12, 0)
+      Part.Anchored = true
+      Part.Transparency = 0.7
+      Part.BrickColor = BrickColor.new("Bright yellow")
+      Part.Name = "BananaSafetyNet"
+      Rayfield:Notify({Title = "Banana Hub", Content = "Platforma pod całą mapą aktywna! 🍌"})
+   end,
+})
+
+-- [[ ⚔️ GIGA COMBAT TAB ]] --
+Combat:CreateToggle({
+   Name = "GIGA Hitbox Reach",
+   CurrentValue = false,
+   Flag = "HitboxToggle",
+   Callback = function(Value)
+      HitboxEnabled = Value
+      if not Value then
+         -- Resetowanie przy wyłączeniu
+         for _, v in pairs(game.Players:GetPlayers()) do
+            pcall(function()
+               if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                  local hrp = v.Character.HumanoidRootPart
+                  hrp.Size = Vector3.new(2, 2, 1)
+                  hrp.Transparency = 1
+                  if hrp:FindFirstChild("BananaBox") then hrp.BananaBox:Destroy() end
+               end
+            end)
+         end
+      end
+   end,
+})
+
+Combat:CreateSlider({
+   Name = "Hitbox Size",
+   Range = {10, 100},
+   Increment = 1,
+   CurrentValue = 35,
+   Callback = function(Value)
+      HitboxSize = Value
+   end,
+})
+
+Combat:CreateToggle({
+   Name = "Auto-Attack (Kill Aura)",
+   CurrentValue = false,
+   Callback = function(Value)
+      KillAura = Value
+      task.spawn(function()
+         while KillAura do
+            local Tool = LP.Character and LP.Character:FindFirstChildOfClass("Tool")
+            if Tool then
+                for _, v in pairs(game.Players:GetPlayers()) do
+                    if v ~= LP and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                        local dist = (LP.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                        if dist < (HitboxSize / 1.1) then
+                            Tool:Activate()
+                            local Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
+                            if Handle then
+                                firetouchinterest(v.Character.HumanoidRootPart, Handle, 0)
+                                firetouchinterest(v.Character.HumanoidRootPart, Handle, 1)
+                            end
+                        end
+                    end
+                end
+            end
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
+
+-- [[ 🛡️ SAFE MODS TAB ]] --
+Player:CreateToggle({
+   Name = "Safe Speed Bypass",
+   CurrentValue = false,
+   Callback = function(Value)
+      SafeSpeedEnabled = Value
+   end,
+})
+
+Player:CreateSlider({
+   Name = "Speed Power",
+   Range = {16, 120},
+   Increment = 1,
+   CurrentValue = 16,
+   Callback = function(Value)
+      SpeedValue = Value
+   end,
+})
+
+Player:CreateButton({
+   Name = "Infinite Jump",
+   Callback = function()
+      game:GetService("UserInputService").JumpRequest:Connect(function()
+         if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            LP.Character.Humanoid:ChangeState("Jumping")
+         end
+      end)
+   end,
+})
+
+Rayfield:LoadConfiguration()
+
+Rayfield:Notify({
+   Title = "🍌 Banana Hub Final v4",
+   Content = "Hitboxy są teraz niezniszczalne. Baw się dobrze!",
+   Duration = 5
+})
