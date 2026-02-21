@@ -1,0 +1,155 @@
+local BananaLib = {}
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+function BananaLib:CreateWindow(Config)
+    local HubName = Config.Name or "BANANA HUB"
+    
+    local UI = Instance.new("ScreenGui", game.CoreGui)
+    UI.Name = "BananaLib_V1"
+
+    -- GŁÓWNA RAMKA
+    local Main = Instance.new("Frame", UI)
+    Main.Size = UDim2.new(0, 500, 0, 350)
+    Main.Position = UDim2.new(0.5, -250, 0.5, -175)
+    Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    Main.BorderSizePixel = 0
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+
+    -- ZŁOTA POŚWIATA (PREMIUM)
+    local Stroke = Instance.new("UIStroke", Main)
+    Stroke.Color = Color3.fromRGB(255, 215, 0)
+    Stroke.Thickness = 2
+    Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    -- SIDEBAR
+    local Sidebar = Instance.new("Frame", Main)
+    Sidebar.Size = UDim2.new(0, 140, 1, 0)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
+
+    local Title = Instance.new("TextLabel", Sidebar)
+    Title.Text = "🍌 " .. HubName
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextColor3 = Color3.fromRGB(255, 215, 0)
+    Title.TextSize = 18
+    Title.BackgroundTransparency = 1
+
+    local TabContainer = Instance.new("ScrollingFrame", Sidebar)
+    TabContainer.Size = UDim2.new(1, 0, 1, -60)
+    TabContainer.Position = UDim2.new(0, 0, 0, 55)
+    TabContainer.BackgroundTransparency = 1
+    TabContainer.ScrollBarThickness = 0
+    Instance.new("UIListLayout", TabContainer).Padding = UDim.new(0, 5)
+
+    -- CONTENT AREA
+    local ContentHolder = Instance.new("Frame", Main)
+    ContentHolder.Size = UDim2.new(1, -150, 1, -10)
+    ContentHolder.Position = UDim2.new(0, 145, 0, 5)
+    ContentHolder.BackgroundTransparency = 1
+
+    -- DRAGGING LOGIC
+    local dragging, dragInput, dragStart, startPos
+    Main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true; dragStart = input.Position; startPos = Main.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    Main.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+
+    local Tabs = {First = nil}
+    function Tabs:CreateTab(Name)
+        local ContentFrame = Instance.new("ScrollingFrame", ContentHolder)
+        ContentFrame.Size = UDim2.new(1, 0, 1, 0)
+        ContentFrame.BackgroundTransparency = 1
+        ContentFrame.Visible = false
+        ContentFrame.ScrollBarThickness = 2
+        ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 215, 0)
+        local List = Instance.new("UIListLayout", ContentFrame)
+        List.Padding = UDim.new(0, 8)
+        List.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+        local TabBtn = Instance.new("TextButton", TabContainer)
+        TabBtn.Size = UDim2.new(0.9, 0, 0, 35)
+        TabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        TabBtn.Text = Name
+        TabBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        TabBtn.Font = Enum.Font.GothamSemibold
+        TabBtn.TextSize = 13
+        Instance.new("UICorner", TabBtn)
+
+        if not Tabs.First then
+            Tabs.First = true
+            ContentFrame.Visible = true
+            TabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            TabBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
+        end
+
+        TabBtn.MouseButton1Click:Connect(function()
+            for _, v in pairs(ContentHolder:GetChildren()) do v.Visible = false end
+            for _, v in pairs(TabContainer:GetChildren()) do 
+                if v:IsA("TextButton") then 
+                    v.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                    v.TextColor3 = Color3.fromRGB(200, 200, 200)
+                end 
+            end
+            ContentFrame.Visible = true
+            TabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            TabBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
+        end)
+
+        local Elements = {}
+        
+        function Elements:CreateButton(Config)
+            local B = Instance.new("TextButton", ContentFrame)
+            B.Size = UDim2.new(0.95, 0, 0, 35)
+            B.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            B.Text = "  " .. Config.Name
+            B.TextColor3 = Color3.fromRGB(255, 255, 255)
+            B.Font = Enum.Font.Gotham
+            B.TextSize = 14
+            B.TextXAlignment = Enum.TextXAlignment.Left
+            Instance.new("UICorner", B)
+            Instance.new("UIStroke", B).Color = Color3.fromRGB(40, 40, 40)
+            B.MouseButton1Click:Connect(Config.Callback)
+        end
+
+        function Elements:CreateToggle(Config)
+            local T = Instance.new("TextButton", ContentFrame)
+            T.Size = UDim2.new(0.95, 0, 0, 35)
+            T.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            T.Text = "  " .. Config.Name
+            T.TextColor3 = Color3.fromRGB(255, 255, 255)
+            T.Font = Enum.Font.Gotham
+            T.TextSize = 14
+            T.TextXAlignment = Enum.TextXAlignment.Left
+            Instance.new("UICorner", T)
+            
+            local Status = Instance.new("Frame", T)
+            Status.Size = UDim2.new(0, 20, 0, 20)
+            Status.Position = UDim2.new(1, -30, 0, 7)
+            Status.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Instance.new("UICorner", Status).CornerRadius = UDim.new(1, 0)
+            
+            local Enabled = Config.CurrentValue or false
+            local function Update()
+                Status.BackgroundColor3 = Enabled and Color3.fromRGB(255, 215, 0) or Color3.fromRGB(50, 50, 50)
+                Config.Callback(Enabled)
+            end
+            T.MouseButton1Click:Connect(function() Enabled = not Enabled; Update() end)
+            Update()
+        end
+
+        return Elements
+    end
+    return Tabs
+end
+
+return BananaLib
