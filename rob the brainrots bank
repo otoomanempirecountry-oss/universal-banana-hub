@@ -1,0 +1,154 @@
+-- [[ 🍌 BANANA HUB | ROB THE BRAINROTS BANK - ULTIMATE CONTROL 🍌 ]] --
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🍌 Banana Hub | Brainrot Bank",
+   LoadingTitle = "Heist Master v8.0",
+   LoadingSubtitle = "by Original Yellow",
+   ConfigurationSaving = { Enabled = true, FolderName = "BananaHub_BankFinal" }
+})
+
+-- [[ ZMIENNE ]] --
+local LP = game.Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local SavedPos = nil
+local HitboxEnabled = false
+local HitboxSize = 35
+local NoclipEnabled = false
+local InfJumpEnabled = false
+local SpeedValue = 16
+local JumpValue = 50
+
+-- [[ ⚙️ GŁÓWNA PĘTLA (FORCE ENGINE) ]] --
+game:GetService("RunService").RenderStepped:Connect(function()
+    -- Noclip
+    if NoclipEnabled and LP.Character then
+        for _, v in pairs(LP.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+    end
+    
+    -- Speed & Jump Power
+    if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid.WalkSpeed = SpeedValue
+        LP.Character.Humanoid.JumpPower = JumpValue
+        -- Naprawa dla gier, które używają JumpHeight zamiast JumpPower
+        LP.Character.Humanoid.UseJumpPower = true
+    end
+
+    -- Hitboxy
+    if HitboxEnabled then
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= LP and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = v.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(HitboxSize, HitboxSize, HitboxSize)
+                hrp.Transparency = 0.7
+                hrp.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- [[ 🚀 INFINITE JUMP LOGIC ]] --
+UIS.JumpRequest:Connect(function()
+    if InfJumpEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+-- [[ 🏗️ TABS ]] --
+local Main = Window:CreateTab("Heist 💰", 4483362458)
+local Player = Window:CreateTab("Movement 🏃", 4483362458)
+
+-- [[ 💰 HEIST TAB ]] --
+
+Main:CreateButton({
+   Name = "TP to Vault (Simple Scan)",
+   Callback = function()
+      for _, v in pairs(workspace:GetDescendants()) do
+         if v:IsA("BasePart") and (v.Name:lower():find("vault") or v.Name:lower():find("safe") or v.Name:lower():find("sejf")) then
+            LP.Character.HumanoidRootPart.CFrame = v.CFrame + Vector3.new(0, 3, 0)
+            break
+         end
+      end
+   end,
+})
+
+Main:CreateButton({
+   Name = "Save Current Position",
+   Callback = function()
+      SavedPos = LP.Character.HumanoidRootPart.CFrame
+      Rayfield:Notify({Title = "Saved!", Content = "Miejsce zapamiętane! 🍌"})
+   end,
+})
+
+Main:CreateButton({
+   Name = "TP to Saved Position",
+   Callback = function()
+      if SavedPos then LP.Character.HumanoidRootPart.CFrame = SavedPos end
+   end,
+})
+
+Main:CreateButton({
+   Name = "Disable Lasers/Traps",
+   Callback = function()
+      for _, v in pairs(workspace:GetDescendants()) do
+         if v:IsA("BasePart") and (v.Name:lower():find("laser") or v.Name:lower():find("kill")) then
+            v.CanTouch = false
+            v.Transparency = 0.5
+         end
+      end
+      Rayfield:Notify({Title = "Safety", Content = "Pułapki wyłączone!"})
+   end,
+})
+
+-- [[ 🏃 MOVEMENT & PVP ]] --
+
+Player:CreateToggle({
+   Name = "Noclip (Wall Hack)",
+   CurrentValue = false,
+   Callback = function(Value) NoclipEnabled = Value end,
+})
+
+Player:CreateToggle({
+   Name = "Infinite Jump",
+   CurrentValue = false,
+   Callback = function(Value) InfJumpEnabled = Value end,
+})
+
+Player:CreateSlider({
+   Name = "WalkSpeed Power",
+   Range = {16, 250},
+   Increment = 1,
+   CurrentValue = 16,
+   Callback = function(Value) SpeedValue = Value end,
+})
+
+Player:CreateSlider({
+   Name = "Jump Power",
+   Range = {50, 500},
+   Increment = 1,
+   CurrentValue = 50,
+   Callback = function(Value) JumpValue = Value end,
+})
+
+Player:CreateSection("PVP Settings")
+
+Player:CreateToggle({
+   Name = "Enable PVP Hitbox",
+   CurrentValue = false,
+   Callback = function(Value) HitboxEnabled = Value end,
+})
+
+Player:CreateSlider({
+   Name = "Hitbox Size",
+   Range = {2, 100},
+   Increment = 1,
+   CurrentValue = 35,
+   Callback = function(Value) HitboxSize = Value end,
+})
+
+Rayfield:LoadConfiguration()
