@@ -1,3 +1,4 @@
+-- [[ 🍌 BANANA CUSTOM LIBRARY V2 - FIXED ]] --
 local BananaLib = {}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -5,30 +6,37 @@ local TweenService = game:GetService("TweenService")
 function BananaLib:CreateWindow(Config)
     local HubName = Config.Name or "BANANA HUB"
     
-    local UI = Instance.new("ScreenGui", game.CoreGui)
-    UI.Name = "BananaLib_V1"
+    local UI = Instance.new("ScreenGui")
+    UI.Name = "BananaLib_V2"
+    UI.Parent = game.CoreGui
 
     -- GŁÓWNA RAMKA
-    local Main = Instance.new("Frame", UI)
+    local Main = Instance.new("Frame")
+    Main.Name = "Main"
+    Main.Parent = UI
     Main.Size = UDim2.new(0, 500, 0, 350)
     Main.Position = UDim2.new(0.5, -250, 0.5, -175)
     Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Main.BorderSizePixel = 0
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
-    -- ZŁOTA POŚWIATA (PREMIUM)
-    local Stroke = Instance.new("UIStroke", Main)
+    -- ZŁOTA POŚWIATA
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Parent = Main
     Stroke.Color = Color3.fromRGB(255, 215, 0)
     Stroke.Thickness = 2
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
     -- SIDEBAR
-    local Sidebar = Instance.new("Frame", Main)
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Name = "Sidebar"
+    Sidebar.Parent = Main
     Sidebar.Size = UDim2.new(0, 140, 1, 0)
     Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
 
-    local Title = Instance.new("TextLabel", Sidebar)
+    local Title = Instance.new("TextLabel")
+    Title.Parent = Sidebar
     Title.Text = "🍌 " .. HubName
     Title.Size = UDim2.new(1, 0, 0, 50)
     Title.Font = Enum.Font.GothamBold
@@ -36,15 +44,22 @@ function BananaLib:CreateWindow(Config)
     Title.TextSize = 18
     Title.BackgroundTransparency = 1
 
-    local TabContainer = Instance.new("ScrollingFrame", Sidebar)
+    local TabContainer = Instance.new("ScrollingFrame")
+    TabContainer.Parent = Sidebar
     TabContainer.Size = UDim2.new(1, 0, 1, -60)
     TabContainer.Position = UDim2.new(0, 0, 0, 55)
     TabContainer.BackgroundTransparency = 1
     TabContainer.ScrollBarThickness = 0
-    Instance.new("UIListLayout", TabContainer).Padding = UDim.new(0, 5)
+    
+    local TabListLayout = Instance.new("UIListLayout")
+    TabListLayout.Parent = TabContainer
+    TabListLayout.Padding = UDim.new(0, 5)
+    TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
     -- CONTENT AREA
-    local ContentHolder = Instance.new("Frame", Main)
+    local ContentHolder = Instance.new("Frame")
+    ContentHolder.Name = "ContentHolder"
+    ContentHolder.Parent = Main
     ContentHolder.Size = UDim2.new(1, -150, 1, -10)
     ContentHolder.Position = UDim2.new(0, 145, 0, 5)
     ContentHolder.BackgroundTransparency = 1
@@ -65,18 +80,23 @@ function BananaLib:CreateWindow(Config)
     Main.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
 
     local Tabs = {First = nil}
+    
     function Tabs:CreateTab(Name)
-        local ContentFrame = Instance.new("ScrollingFrame", ContentHolder)
+        local ContentFrame = Instance.new("ScrollingFrame")
+        ContentFrame.Parent = ContentHolder
         ContentFrame.Size = UDim2.new(1, 0, 1, 0)
         ContentFrame.BackgroundTransparency = 1
         ContentFrame.Visible = false
         ContentFrame.ScrollBarThickness = 2
         ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 215, 0)
-        local List = Instance.new("UIListLayout", ContentFrame)
+        
+        local List = Instance.new("UIListLayout")
+        List.Parent = ContentFrame
         List.Padding = UDim.new(0, 8)
         List.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-        local TabBtn = Instance.new("TextButton", TabContainer)
+        local TabBtn = Instance.new("TextButton")
+        TabBtn.Parent = TabContainer
         TabBtn.Size = UDim2.new(0.9, 0, 0, 35)
         TabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         TabBtn.Text = Name
@@ -86,14 +106,16 @@ function BananaLib:CreateWindow(Config)
         Instance.new("UICorner", TabBtn)
 
         if not Tabs.First then
-            Tabs.First = true
+            Tabs.First = ContentFrame
             ContentFrame.Visible = true
             TabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
             TabBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
         end
 
         TabBtn.MouseButton1Click:Connect(function()
-            for _, v in pairs(ContentHolder:GetChildren()) do v.Visible = false end
+            for _, v in pairs(ContentHolder:GetChildren()) do
+                if v:IsA("ScrollingFrame") then v.Visible = false end
+            end
             for _, v in pairs(TabContainer:GetChildren()) do 
                 if v:IsA("TextButton") then 
                     v.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -108,7 +130,8 @@ function BananaLib:CreateWindow(Config)
         local Elements = {}
         
         function Elements:CreateButton(Config)
-            local B = Instance.new("TextButton", ContentFrame)
+            local B = Instance.new("TextButton")
+            B.Parent = ContentFrame
             B.Size = UDim2.new(0.95, 0, 0, 35)
             B.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
             B.Text = "  " .. Config.Name
@@ -117,12 +140,17 @@ function BananaLib:CreateWindow(Config)
             B.TextSize = 14
             B.TextXAlignment = Enum.TextXAlignment.Left
             Instance.new("UICorner", B)
-            Instance.new("UIStroke", B).Color = Color3.fromRGB(40, 40, 40)
+            
+            local BStroke = Instance.new("UIStroke")
+            BStroke.Parent = B
+            BStroke.Color = Color3.fromRGB(40, 40, 40)
+            
             B.MouseButton1Click:Connect(Config.Callback)
         end
 
         function Elements:CreateToggle(Config)
-            local T = Instance.new("TextButton", ContentFrame)
+            local T = Instance.new("TextButton")
+            T.Parent = ContentFrame
             T.Size = UDim2.new(0.95, 0, 0, 35)
             T.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
             T.Text = "  " .. Config.Name
@@ -132,7 +160,8 @@ function BananaLib:CreateWindow(Config)
             T.TextXAlignment = Enum.TextXAlignment.Left
             Instance.new("UICorner", T)
             
-            local Status = Instance.new("Frame", T)
+            local Status = Instance.new("Frame")
+            Status.Parent = T
             Status.Size = UDim2.new(0, 20, 0, 20)
             Status.Position = UDim2.new(1, -30, 0, 7)
             Status.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
