@@ -1,15 +1,14 @@
--- Banana UI v6 – PEŁNA DZIAŁAJĄCA BIBLIOTEKA (tabs, toggle, slider, button, dropdown, keybind, notify, drag, minimize, ripple)
--- Kopiuj całość i ładuj – wszystko w jednym pliku
+-- Banana UI v6.0 – CZYSTA BIBLIOTEKA (bez wbudowanej logiki cheatów)
+-- Zakładki, toggle, slider, button, dropdown, keybind, notify, drag, minimize, ripple
+-- Użyj callbacków do dodawania własnej logiki
 
 local Banana = {}
 
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local lp = Players.LocalPlayer
 
--- Theme (ciemny + bananowy vibe)
+-- Theme
 local Theme = {
     Background = Color3.fromRGB(18, 18, 24),
     Accent    = Color3.fromRGB(255, 225, 80),
@@ -24,7 +23,7 @@ local Theme = {
     Darker    = Color3.fromRGB(10, 10, 16),
 }
 
--- Powiadomienia – kolejka + animacja
+-- Notify system
 local NotificationQueue = {}
 
 local function Notify(title, content, duration)
@@ -108,7 +107,7 @@ spawn(function()
     end
 end)
 
--- CreateWindow – główne okno
+-- CreateWindow
 function Banana:CreateWindow(options)
     local name = options.Name or "Banana Hub 🍌"
 
@@ -191,7 +190,7 @@ function Banana:CreateWindow(options)
         task.delay(0.65, sg.Destroy, sg)
     end)
 
-    -- Drag okna
+    -- Drag
     local dragging, dragInput, dragStart, startPos
     top.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -648,7 +647,7 @@ function Banana:CreateWindow(options)
         return tabObj
     end
 
-    Notify("Banana UI v5.4", "Biblioteka załadowana – możesz dodawać zakładki, toggle, slidery itd.", 6)
+    Notify("Banana UI v6", "Biblioteka załadowana – dodawaj własne funkcje w callbackach", 6)
 
     return window
 end
