@@ -1,6 +1,5 @@
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
@@ -9,226 +8,173 @@ local Banana = {}
 Banana.__index = Banana
 
 local Theme = {
-    BG = Color3.fromRGB(20,20,20),
-    Accent = Color3.fromRGB(255, 221, 0),
-    Text = Color3.fromRGB(255,255,255),
-    Dark = Color3.fromRGB(35,35,35)
+	BG = Color3.fromRGB(18,18,18),
+	Side = Color3.fromRGB(28,28,28),
+	Accent = Color3.fromRGB(255,221,0),
+	Text = Color3.fromRGB(240,240,240)
 }
 
--- CONFIG STORAGE
-local ConfigData = {}
-
--- DRAG
+-- draggable
 local function MakeDraggable(frame)
-    local dragging, start, startPos
+	local dragging, dragStart, startPos
 
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            start = input.Position
-            startPos = frame.Position
-        end
-    end)
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+		end
+	end)
 
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - start
-            frame.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end)
 
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = false
+		end
+	end)
 end
 
 function Banana:CreateWindow(title)
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-    local Main = Instance.new("Frame", ScreenGui)
-    Main.Size = UDim2.new(0,600,0,450)
-    Main.Position = UDim2.new(0.5,-300,0.5,-225)
-    Main.BackgroundColor3 = Theme.BG
-    Main.BorderSizePixel = 0
+	local ScreenGui = Instance.new("ScreenGui")
+	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-    MakeDraggable(Main)
+	local Main = Instance.new("Frame", ScreenGui)
+	Main.Size = UDim2.new(0,650,0,450)
+	Main.Position = UDim2.new(0.5,-325,0.5,-225)
+	Main.BackgroundColor3 = Theme.BG
+	Main.BorderSizePixel = 0
+	Main.Name = "BananaMain"
 
-    Instance.new("UIStroke", Main).Color = Theme.Accent
+	local UICorner = Instance.new("UICorner", Main)
+	UICorner.CornerRadius = UDim.new(0,12)
 
-    local Title = Instance.new("TextLabel", Main)
-    Title.Size = UDim2.new(1,0,0,40)
-    Title.Text = title
-    Title.BackgroundTransparency = 1
-    Title.TextColor3 = Theme.Accent
-    Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 20
+	local Stroke = Instance.new("UIStroke", Main)
+	Stroke.Color = Theme.Accent
+	Stroke.Thickness = 2
 
-    -- Tabs bar
-    local TabBar = Instance.new("Frame", Main)
-    TabBar.Position = UDim2.new(0,0,0,40)
-    TabBar.Size = UDim2.new(0,150,1,-40)
-    TabBar.BackgroundColor3 = Theme.Dark
+	MakeDraggable(Main)
 
-    local Content = Instance.new("Frame", Main)
-    Content.Position = UDim2.new(0,150,0,40)
-    Content.Size = UDim2.new(1,-150,1,-40)
-    Content.BackgroundTransparency = 1
+	local Title = Instance.new("TextLabel", Main)
+	Title.Size = UDim2.new(1,0,0,45)
+	Title.BackgroundTransparency = 1
+	Title.Text = title
+	Title.Font = Enum.Font.GothamBold
+	Title.TextSize = 22
+	Title.TextColor3 = Theme.Accent
 
-    local Window = {}
-    Window.Tabs = {}
+	local Side = Instance.new("Frame", Main)
+	Side.Position = UDim2.new(0,0,0,45)
+	Side.Size = UDim2.new(0,160,1,-45)
+	Side.BackgroundColor3 = Theme.Side
+	Instance.new("UICorner", Side).CornerRadius = UDim.new(0,12)
 
-    function Window:CreateTab(name)
-        local TabButton = Instance.new("TextButton", TabBar)
-        TabButton.Size = UDim2.new(1,0,0,40)
-        TabButton.Text = name
-        TabButton.BackgroundColor3 = Theme.Dark
-        TabButton.TextColor3 = Theme.Text
+	local Content = Instance.new("Frame", Main)
+	Content.Position = UDim2.new(0,160,0,45)
+	Content.Size = UDim2.new(1,-160,1,-45)
+	Content.BackgroundTransparency = 1
 
-        local TabFrame = Instance.new("ScrollingFrame", Content)
-        TabFrame.Size = UDim2.new(1,0,1,0)
-        TabFrame.CanvasSize = UDim2.new(0,0,0,0)
-        TabFrame.ScrollBarThickness = 4
-        TabFrame.Visible = false
-        TabFrame.BackgroundTransparency = 1
+	local Window = {}
+	Window.Tabs = {}
+	Window.CurrentTab = nil
 
-        local Layout = Instance.new("UIListLayout", TabFrame)
-        Layout.Padding = UDim.new(0,8)
+	-- multi tab fix
+	function Window:CreateTab(name)
 
-        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabFrame.CanvasSize = UDim2.new(0,0,0,Layout.AbsoluteContentSize.Y + 10)
-        end)
+		local TabButton = Instance.new("TextButton", Side)
+		TabButton.Size = UDim2.new(1,-10,0,40)
+		TabButton.Position = UDim2.new(0,5,0,#Window.Tabs*45 + 5)
+		TabButton.Text = name
+		TabButton.BackgroundColor3 = Theme.Side
+		TabButton.TextColor3 = Theme.Text
+		TabButton.BorderSizePixel = 0
+		Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0,8)
 
-        TabButton.MouseButton1Click:Connect(function()
-            for _,tab in pairs(Window.Tabs) do
-                tab.Frame.Visible = false
-            end
-            TabFrame.Visible = true
-        end)
+		local TabFrame = Instance.new("ScrollingFrame", Content)
+		TabFrame.Size = UDim2.new(1,0,1,0)
+		TabFrame.CanvasSize = UDim2.new(0,0,0,0)
+		TabFrame.ScrollBarThickness = 4
+		TabFrame.Visible = false
+		TabFrame.BackgroundTransparency = 1
 
-        local Tab = {}
-        Tab.Frame = TabFrame
+		local Layout = Instance.new("UIListLayout", TabFrame)
+		Layout.Padding = UDim.new(0,8)
 
-        -- BUTTON
-        function Tab:CreateButton(text, callback)
-            local B = Instance.new("TextButton", TabFrame)
-            B.Size = UDim2.new(1,-10,0,40)
-            B.Text = text
-            B.BackgroundColor3 = Theme.Accent
-            B.TextColor3 = Color3.new(0,0,0)
+		Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			TabFrame.CanvasSize = UDim2.new(0,0,0,Layout.AbsoluteContentSize.Y + 10)
+		end)
 
-            B.MouseButton1Click:Connect(function()
-                if callback then callback() end
-            end)
-        end
+		TabButton.MouseButton1Click:Connect(function()
+			for _,tab in pairs(Window.Tabs) do
+				tab.Frame.Visible = false
+			end
+			TabFrame.Visible = true
+			Window.CurrentTab = TabFrame
+		end)
 
-        -- TOGGLE
-        function Tab:CreateToggle(text, default, callback)
-            local state = default
-            ConfigData[text] = state
+		if not Window.CurrentTab then
+			TabFrame.Visible = true
+			Window.CurrentTab = TabFrame
+		end
 
-            local B = Instance.new("TextButton", TabFrame)
-            B.Size = UDim2.new(1,-10,0,40)
-            B.Text = text.." : "..tostring(state)
-            B.BackgroundColor3 = Theme.Dark
-            B.TextColor3 = Theme.Text
+		local Tab = {}
+		Tab.Frame = TabFrame
 
-            B.MouseButton1Click:Connect(function()
-                state = not state
-                ConfigData[text] = state
-                B.Text = text.." : "..tostring(state)
-                if callback then callback(state) end
-            end)
-        end
+		function Tab:CreateButton(text, callback)
+			local B = Instance.new("TextButton", TabFrame)
+			B.Size = UDim2.new(1,-15,0,40)
+			B.Text = text
+			B.BackgroundColor3 = Theme.Accent
+			B.TextColor3 = Color3.new(0,0,0)
+			B.BorderSizePixel = 0
+			Instance.new("UICorner", B).CornerRadius = UDim.new(0,8)
 
-        -- SLIDER (smooth)
-        function Tab:CreateSlider(text, min, max, default, callback)
-            local value = default
-            ConfigData[text] = value
+			B.MouseButton1Click:Connect(function()
+				if callback then callback() end
+			end)
+		end
 
-            local Frame = Instance.new("Frame", TabFrame)
-            Frame.Size = UDim2.new(1,-10,0,50)
-            Frame.BackgroundColor3 = Theme.Dark
+		function Tab:CreateToggle(text, default, callback)
+			local state = default
+			local B = Instance.new("TextButton", TabFrame)
+			B.Size = UDim2.new(1,-15,0,40)
+			B.Text = text.." : "..tostring(state)
+			B.BackgroundColor3 = Theme.Side
+			B.TextColor3 = Theme.Text
+			B.BorderSizePixel = 0
+			Instance.new("UICorner", B).CornerRadius = UDim.new(0,8)
 
-            local Label = Instance.new("TextLabel", Frame)
-            Label.Size = UDim2.new(1,0,0,20)
-            Label.Text = text.." : "..value
-            Label.BackgroundTransparency = 1
-            Label.TextColor3 = Theme.Text
+			B.MouseButton1Click:Connect(function()
+				state = not state
+				B.Text = text.." : "..tostring(state)
+				if callback then callback(state) end
+			end)
+		end
 
-            local Bar = Instance.new("Frame", Frame)
-            Bar.Position = UDim2.new(0,10,0,30)
-            Bar.Size = UDim2.new(1,-20,0,10)
-            Bar.BackgroundColor3 = Color3.fromRGB(60,60,60)
+		Window.Tabs[name] = Tab
+		return Tab
+	end
 
-            local Fill = Instance.new("Frame", Bar)
-            Fill.BackgroundColor3 = Theme.Accent
-            Fill.Size = UDim2.new((value-min)/(max-min),0,1,0)
+	function Window:SetToggleKey(key)
+		UserInputService.InputBegan:Connect(function(input)
+			if input.KeyCode == key then
+				Main.Visible = not Main.Visible
+			end
+		end)
+	end
 
-            local dragging = false
-
-            Bar.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                end
-            end)
-
-            UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = false
-                end
-            end)
-
-            UserInputService.InputChanged:Connect(function(input)
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local percent = math.clamp(
-                        (input.Position.X - Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,
-                        0,1
-                    )
-                    value = math.floor(min + (max-min)*percent)
-                    ConfigData[text] = value
-                    Fill.Size = UDim2.new(percent,0,1,0)
-                    Label.Text = text.." : "..value
-                    if callback then callback(value) end
-                end
-            end)
-        end
-
-        Window.Tabs[name] = Tab
-        return Tab
-    end
-
-    -- CONFIG SAVE
-    function Window:SaveConfig(name)
-        if writefile then
-            if not isfolder("BananaConfigs") then
-                makefolder("BananaConfigs")
-            end
-            writefile("BananaConfigs/"..name..".banana",
-                HttpService:JSONEncode(ConfigData)
-            )
-        end
-    end
-
-    function Window:LoadConfig(name)
-        if readfile and isfile("BananaConfigs/"..name..".banana") then
-            local data = HttpService:JSONDecode(
-                readfile("BananaConfigs/"..name..".banana")
-            )
-            for k,v in pairs(data) do
-                ConfigData[k] = v
-            end
-        end
-    end
-
-    return Window
+	return Window
 end
 
 return setmetatable({}, Banana)
