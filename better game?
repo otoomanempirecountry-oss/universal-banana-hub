@@ -1,0 +1,155 @@
+-- [[ BANANA HUB V4 | BETTER GAME EDITION 🍌 ]] --
+-- Biblioteka: Rayfield
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- [[ OKNO GŁÓWNE ]] --
+local Window = Rayfield:CreateWindow({
+   Name = "BANANA HUB 🍌 | Better Game",
+   LoadingTitle = "Banana Team Official",
+   LoadingSubtitle = "by Gemini AI",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "BananaHubConfig",
+      FileName = "BetterGameMain"
+   },
+   KeySystem = false -- Ustaw na true, jeśli chcesz dodać system kluczy
+})
+
+-- [[ ZMIENNE GLOBALNE ]] --
+getgenv().HitboxEnabled = false
+getgenv().HitboxSize = 2
+getgenv().NoClip = false
+getgenv().AutoCollect = false
+getgenv().WalkSpeedValue = 16
+
+-- [[ ZAKŁADKA: COMBAT ]] --
+local TabCombat = Window:CreateTab("Combat ⚔️", 4483362458)
+local CombatSection = TabCombat:CreateSection("PvP Hitboxes")
+
+TabCombat:CreateToggle({
+   Name = "Expand Hitboxes (Big Head)",
+   CurrentValue = false,
+   Flag = "HitboxToggle",
+   Callback = function(Value)
+      getgenv().HitboxEnabled = Value
+      Rayfield:Notify({
+         Title = "Combat",
+         Content = Value and "Hitboxy Aktywne!" or "Hitboxy Wyłączone",
+         Duration = 2
+      })
+   end,
+})
+
+TabCombat:CreateSlider({
+   Name = "Hitbox Size",
+   Range = {2, 30},
+   Increment = 1,
+   Suffix = " Studs",
+   CurrentValue = 2,
+   Flag = "HitboxSize",
+   Callback = function(Value)
+      getgenv().HitboxSize = Value
+   end,
+})
+
+-- [[ ZAKŁADKA: AUTO-FARM ]] --
+local TabFarm = Window:CreateTab("Auto-Farm 💰", 4483362458)
+TabFarm:CreateSection("Zarabianie i Składniki")
+
+TabFarm:CreateToggle({
+   Name = "Auto-Collect Ingredients",
+   CurrentValue = false,
+   Flag = "AutoFarm",
+   Callback = function(Value)
+      getgenv().AutoCollect = Value
+      if Value then
+         task.spawn(function()
+            while getgenv().AutoCollect do
+               pcall(function()
+                  -- Logika szukania składników (Food/Money) w Better Game
+                  for _, item in pairs(workspace:GetDescendants()) do
+                     if (item.Name == "Food" or item.Name == "Ingredient" or item.Name == "Cash") and item:IsA("BasePart") then
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = item.CFrame
+                        task.wait(0.2)
+                     end
+                     if not getgenv().AutoCollect then break end
+                  end
+               end)
+               task.wait(1)
+            end
+         end)
+      end
+   end,
+})
+
+-- [[ ZAKŁADKA: PLAYER ]] --
+local TabPlayer = Window:CreateTab("Player 🏃", 4483362458)
+TabPlayer:CreateSection("Movement Mods")
+
+TabPlayer:CreateSlider({
+   Name = "WalkSpeed Bypass",
+   Range = {16, 200},
+   Increment = 1,
+   Suffix = " Speed",
+   CurrentValue = 16,
+   Flag = "SpeedSlider",
+   Callback = function(Value)
+      getgenv().WalkSpeedValue = Value
+   end,
+})
+
+TabPlayer:CreateToggle({
+   Name = "No-Clip (Przenikanie)",
+   CurrentValue = false,
+   Flag = "NoClipToggle",
+   Callback = function(Value)
+      getgenv().NoClip = Value
+   end,
+})
+
+-- [[ PĘTLE SYSTEMOWE (LOGIKA DZIAŁANIA) ]] --
+
+-- Pętla Hitboxów
+task.spawn(function()
+    while task.wait(0.5) do
+        if getgenv().HitboxEnabled then
+            for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local hrp = player.Character.HumanoidRootPart
+                    hrp.Size = Vector3.new(getgenv().HitboxSize, getgenv().HitboxSize, getgenv().HitboxSize)
+                    hrp.Transparency = 0.7
+                    hrp.BrickColor = BrickColor.new("Really blue")
+                    hrp.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- Pętla NoClip & WalkSpeed
+game:GetService("RunService").Stepped:Connect(function()
+    local char = game.Players.LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        -- Obsługa Speed
+        char.Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+        
+        -- Obsługa NoClip
+        if getgenv().NoClip then
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- Załaduj konfigurację
+Rayfield:LoadConfiguration()
+
+Rayfield:Notify({
+   Title = "Banana Hub Gotowy!",
+   Content = "Wszystkie funkcje załadowane pomyślnie. 🍌",
+   Duration = 5
+})
