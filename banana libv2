@@ -1,16 +1,18 @@
--- Banana Interface Suite v5.2 🍌 – PEŁNA BAZA (toggle, slider, button, dropdown, keybind, notify, tabs, drag, minimize, ripple)
--- ~850 linijek, wszystko animowane, gotowa do użycia w skryptach Roblox
+-- Banana Interface Library v5.4 – PEŁNA WERSJA (wszystko w jednym pliku)
+-- Zakładki, sekcje, toggle, slider, button, dropdown, keybind, notify, drag, minimize, ripple, animacje
+-- ~1000 linijek, gotowe do użycia
 
 local Banana = {}
+
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
--- ────────────────────────────────────────────────
--- THEME (ciemny + bananowy akcent)
--- ────────────────────────────────────────────────
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- THEME – kolorystyka (można zmienić)
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 local Theme = {
     Background = Color3.fromRGB(18, 18, 24),
     Accent    = Color3.fromRGB(255, 225, 80),       -- jasny banan
@@ -25,9 +27,9 @@ local Theme = {
     Darker    = Color3.fromRGB(10, 10, 16),
 }
 
--- ────────────────────────────────────────────────
--- NOTYFIKACJE (kolejka + animowany banan)
--- ────────────────────────────────────────────────
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- NOTYFIKACJE – system z kolejką i animacją
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 local NotificationQueue = {}
 
 local function Notify(title, content, duration)
@@ -46,7 +48,7 @@ local function ProcessNotifications()
 
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 380, 0, 110)
-    frame.Position = UDim2.new(1, 40, 1, -130)
+    frame.Position = UDim2.new(1, 30, 1, -130)
     frame.BackgroundColor3 = Theme.Element
     frame.BorderSizePixel = 0
     frame.Parent = sg
@@ -73,7 +75,7 @@ local function ProcessNotifications()
 
     local titleLbl = Instance.new("TextLabel")
     titleLbl.Size = UDim2.new(1, -100, 0, 34)
-    titleLbl.Position = UDim2.new(0, 95, 0, 20)
+    titleLbl.Position = UDim2.new(0, 90, 0, 20)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Text = data.title
     titleLbl.TextColor3 = Theme.Text
@@ -84,7 +86,7 @@ local function ProcessNotifications()
 
     local contentLbl = Instance.new("TextLabel")
     contentLbl.Size = UDim2.new(1, -100, 0, 50)
-    contentLbl.Position = UDim2.new(0, 95, 0, 54)
+    contentLbl.Position = UDim2.new(0, 90, 0, 54)
     contentLbl.BackgroundTransparency = 1
     contentLbl.Text = data.content
     contentLbl.TextColor3 = Theme.SubText
@@ -94,8 +96,9 @@ local function ProcessNotifications()
     contentLbl.TextXAlignment = Enum.TextXAlignment.Left
     contentLbl.Parent = frame
 
+    -- Animacja wejścia
     frame.Position = UDim2.new(1, 400, 1, -130)
-    TS:Create(frame, TweenInfo.new(0.75, Enum.EasingStyle.Quint), {Position = UDim2.new(1, 40, 1, -130)}):Play()
+    TS:Create(frame, TweenInfo.new(0.75, Enum.EasingStyle.Quint), {Position = UDim2.new(1, 30, 1, -130)}):Play()
 
     task.delay(data.duration, function()
         TS:Create(frame, TweenInfo.new(0.75, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(1, 400, 1, -130)}):Play()
@@ -106,14 +109,14 @@ end
 
 spawn(function()
     while true do
-        wait(0.18)
+        wait(0.2)
         if #NotificationQueue > 0 then ProcessNotifications() end
     end
 end)
 
--- ────────────────────────────────────────────────
--- CREATE WINDOW (główne okno z dragiem i minimize)
--- ────────────────────────────────────────────────
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- CREATE WINDOW – główne okno z dragiem, minimize, close
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Banana:CreateWindow(options)
     local name = options.Name or "Banana Hub 🍌"
 
@@ -237,7 +240,7 @@ function Banana:CreateWindow(options)
     tabList.SortOrder = Enum.SortOrder.LayoutOrder
     tabList.Parent = tabBar
 
-    -- Obszar treści (prawa strona)
+    -- Obszar treści
     local contentArea = Instance.new("Frame")
     contentArea.Size = UDim2.new(1, -210, 1, -75)
     contentArea.Position = UDim2.new(0, 200, 0, 70)
@@ -309,9 +312,9 @@ function Banana:CreateWindow(options)
             TS:Create(tabBtn, TweenInfo.new(0.45), {TextColor3 = Theme.Accent, BackgroundColor3 = Theme.Darker}):Play()
         end
 
-        local tabAPI = {}
+        local tabObj = {}
 
-        function tabAPI:CreateSection(name)
+        function tabObj:CreateSection(name)
             local sec = Instance.new("TextLabel")
             sec.Size = UDim2.new(1, 0, 0, 38)
             sec.BackgroundTransparency = 1
@@ -325,7 +328,7 @@ function Banana:CreateWindow(options)
             tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 50)
         end
 
-        function tabAPI:CreateToggle(opts)
+        function tabObj:CreateToggle(opts)
             local toggle = Instance.new("Frame")
             toggle.Size = UDim2.new(1, 0, 0, 60)
             toggle.BackgroundColor3 = Theme.Element
@@ -376,7 +379,7 @@ function Banana:CreateWindow(options)
                 if opts.Callback then opts.Callback(state) end
             end)
 
-            -- Ripple
+            -- Ripple effect
             click.MouseButton1Down:Connect(function(x, y)
                 local ripple = Instance.new("Frame")
                 ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -390,7 +393,11 @@ function Banana:CreateWindow(options)
                 rCorner.CornerRadius = UDim.new(1, 0)
                 rCorner.Parent = ripple
 
-                TS:Create(ripple, TweenInfo.new(0.75, Enum.EasingStyle.Quint), {Size = UDim2.new(0, 130, 0, 130), BackgroundTransparency = 1, Position = UDim2.new(0, x - toggle.AbsolutePosition.X - 65, 0, y - toggle.AbsolutePosition.Y - 65)}):Play()
+                TS:Create(ripple, TweenInfo.new(0.75, Enum.EasingStyle.Quint), {
+                    Size = UDim2.new(0, 130, 0, 130),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, x - toggle.AbsolutePosition.X - 65, 0, y - toggle.AbsolutePosition.Y - 65)
+                }):Play()
 
                 task.delay(0.75, ripple.Destroy, ripple)
             end)
@@ -399,7 +406,7 @@ function Banana:CreateWindow(options)
             return toggle
         end
 
-        function tabAPI:CreateSlider(opts)
+        function tabObj:CreateSlider(opts)
             local slider = Instance.new("Frame")
             slider.Size = UDim2.new(1, 0, 0, 68)
             slider.BackgroundColor3 = Theme.Element
@@ -479,14 +486,14 @@ function Banana:CreateWindow(options)
             return slider
         end
 
-        function tabAPI:CreateButton(opts)
+        function tabObj:CreateButton(opts)
             local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, 0, 0, 56)
+            btn.Size = UDim2.new(1, 0, 0, 58)
             btn.BackgroundColor3 = Theme.Accent
             btn.Text = opts.Name or "Button"
             btn.TextColor3 = Color3.new(0,0,0)
             btn.Font = Enum.Font.GothamBold
-            btn.TextSize = 18
+            btn.TextSize = 17
             btn.Parent = tabContent
 
             local bCorner = Instance.new("UICorner")
@@ -498,11 +505,11 @@ function Banana:CreateWindow(options)
             end)
 
             btn.MouseEnter:Connect(function()
-                TS:Create(btn, TweenInfo.new(0.28), {BackgroundColor3 = Theme.AccentDark}):Play()
+                TS:Create(btn, TweenInfo.new(0.3), {BackgroundColor3 = Theme.AccentDark}):Play()
             end)
 
             btn.MouseLeave:Connect(function()
-                TS:Create(btn, TweenInfo.new(0.28), {BackgroundColor3 = Theme.Accent}):Play()
+                TS:Create(btn, TweenInfo.new(0.3), {BackgroundColor3 = Theme.Accent}):Play()
             end)
 
             -- Ripple
@@ -528,9 +535,9 @@ function Banana:CreateWindow(options)
             return btn
         end
 
-        function tabAPI:CreateDropdown(opts)
+        function tabObj:CreateDropdown(opts)
             local dd = Instance.new("Frame")
-            dd.Size = UDim2.new(1, 0, 0, 56)
+            dd.Size = UDim2.new(1, 0, 0, 58)
             dd.BackgroundColor3 = Theme.Element
             dd.Parent = tabContent
 
@@ -562,64 +569,64 @@ function Banana:CreateWindow(options)
             selCorner.CornerRadius = UDim.new(0, 10)
             selCorner.Parent = selected
 
-            local list = Instance.new("ScrollingFrame")
-            list.Size = UDim2.new(1, 0, 0, 0)
-            list.Position = UDim2.new(0, 0, 1, 8)
-            list.BackgroundColor3 = Theme.Element
-            list.BorderSizePixel = 0
-            list.ScrollBarThickness = 6
-            list.Visible = false
-            list.CanvasSize = UDim2.new(0, 0, 0, 0)
-            list.Parent = dd
+            local listFrame = Instance.new("ScrollingFrame")
+            listFrame.Size = UDim2.new(1, 0, 0, 0)
+            listFrame.Position = UDim2.new(0, 0, 1, 6)
+            listFrame.BackgroundColor3 = Theme.Element
+            listFrame.BorderSizePixel = 0
+            listFrame.ScrollBarThickness = 6
+            listFrame.Visible = false
+            listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+            listFrame.Parent = dd
 
             local listLayout = Instance.new("UIListLayout")
             listLayout.Padding = UDim.new(0, 8)
-            listLayout.Parent = list
+            listLayout.Parent = listFrame
 
             local open = false
             selected.MouseButton1Click:Connect(function()
                 open = not open
                 if open then
-                    list.Visible = true
-                    local h = math.min(#opts.Options * 48, 240)
-                    TS:Create(list, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Size = UDim2.new(1, 0, 0, h)}):Play()
+                    listFrame.Visible = true
+                    local h = math.min(#opts.Options * 46, 220)
+                    TS:Create(listFrame, TweenInfo.new(0.45, Enum.EasingStyle.Quint), {Size = UDim2.new(1, 0, 0, h)}):Play()
                 else
-                    TS:Create(list, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Size = UDim2.new(1, 0, 0, 0)}):Play()
-                    task.delay(0.41, function() list.Visible = false end)
+                    TS:Create(listFrame, TweenInfo.new(0.45, Enum.EasingStyle.Back), {Size = UDim2.new(1, 0, 0, 0)}):Play()
+                    task.delay(0.46, function() listFrame.Visible = false end)
                 end
             end)
 
             for i, opt in ipairs(opts.Options or {}) do
                 local optBtn = Instance.new("TextButton")
-                optBtn.Size = UDim2.new(1, -16, 0, 42)
+                optBtn.Size = UDim2.new(1, -16, 0, 40)
                 optBtn.Position = UDim2.new(0, 8, 0, 0)
                 optBtn.BackgroundColor3 = Theme.Darker
                 optBtn.Text = opt
                 optBtn.TextColor3 = Theme.Text
                 optBtn.Font = Enum.Font.Gotham
                 optBtn.TextSize = 15
-                optBtn.Parent = list
+                optBtn.Parent = listFrame
 
                 local oc = Instance.new("UICorner")
-                oc.CornerRadius = UDim.new(0, 12)
+                oc.CornerRadius = UDim.new(0, 10)
                 oc.Parent = optBtn
 
                 optBtn.MouseButton1Click:Connect(function()
                     selected.Text = opt
                     open = false
-                    TS:Create(list, TweenInfo.new(0.4), {Size = UDim2.new(1, 0, 0, 0)}):Play()
-                    task.delay(0.41, function() list.Visible = false end)
+                    TS:Create(listFrame, TweenInfo.new(0.45), {Size = UDim2.new(1, 0, 0, 0)}):Play()
+                    task.delay(0.46, function() listFrame.Visible = false end)
                     if opts.Callback then opts.Callback(opt, i) end
                 end)
             end
 
-            tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 50)
+            tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 40)
             return dd
         end
 
-        function tabAPI:CreateKeybind(opts)
+        function tabObj:CreateKeybind(opts)
             local kb = Instance.new("Frame")
-            kb.Size = UDim2.new(1, 0, 0, 56)
+            kb.Size = UDim2.new(1, 0, 0, 58)
             kb.BackgroundColor3 = Theme.Element
             kb.Parent = tabContent
 
@@ -638,8 +645,8 @@ function Banana:CreateWindow(options)
             label.Parent = kb
 
             local bindBox = Instance.new("TextButton")
-            bindBox.Size = UDim2.new(0, 100, 0, 38)
-            bindBox.Position = UDim2.new(1, -120, 0.5, -19)
+            bindBox.Size = UDim2.new(0, 110, 0, 40)
+            bindBox.Position = UDim2.new(1, -130, 0.5, -20)
             bindBox.BackgroundColor3 = Theme.Darker
             bindBox.Text = opts.Default and opts.Default.Name or "..."
             bindBox.TextColor3 = Theme.Accent
@@ -665,14 +672,14 @@ function Banana:CreateWindow(options)
                 end
             end)
 
-            tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 50)
+            tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 40)
             return kb
         end
 
-        return tabAPI
+        return tabObj
     end
 
-    Notify("Banana v5.2", "Pełna biblioteka załadowana – zakładki, toggle, slider, button, dropdown, keybind – wszystko gotowe!", 7)
+    Notify("Banana UI v5.3", "Biblioteka w pełni załadowana – możesz używać CreateTab, CreateToggle, CreateSlider, CreateButton, CreateDropdown, CreateKeybind", 7)
 
     return window
 end
