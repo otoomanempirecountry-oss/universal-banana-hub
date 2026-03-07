@@ -1,0 +1,133 @@
+-- [[ 🍌 BANANA HUB | PRIVATE PREMIUM LOADER 🍌 ]] --
+-- [[ STATUS: ALL GAMES OPERATIONAL ]] --
+
+local LPlayer = game.Players.LocalPlayer
+local GameId = game.PlaceId
+
+-- Baza linków PREMIUM (Zaktualizowana o Better Game? oraz Rob The Brainrots Bank)
+local Scripts = {
+    [109169383814801] = {Name = "Better Game? [🍌 EXCLUSIVE]", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/refs/heads/main/better%20game%3F"},
+    [78020950182245] = {Name = "Rob The Brainrots Bank [💰 HEIST]", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/refs/heads/main/rob%20the%20brainrots%20bank"},
+    [18960834681] = {Name = "Pick Better Food [👑 GIGA]", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/refs/heads/main/better%20food%3F"},
+    [537413528] = {Name = "Build A Boat [💎 PREMIUM]", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/refs/heads/main/build%20a%20boat"},
+    [18884422] = {Name = "Natural Disaster Survival", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/main/natural%20disaster"},
+    [3956818381] = {Name = "Muscle Legends", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/main/muscle%20legends"},
+    [13772394625] = {Name = "Blade Ball", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/main/blade%20ball"},
+    [4924144172] = {Name = "Brookhaven RP", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/main/brookhaven"},
+    [70912600118748] = {Name = "Don't Wake Retro Cats", Raw = "https://raw.githubusercontent.com/otoomanempirecountry-oss/universal-banana-hub/refs/heads/main/retro%20cats"}
+}
+
+local function Notify(title, text)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = title,
+        Text = text,
+        Icon = "rbxassetid://4483362458",
+        Duration = 5
+    })
+end
+
+-- [[ INTERFEJS UŻYTKOWNIKA ]] --
+local BananaLoader = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local Status = Instance.new("TextLabel")
+local ExecBtn = Instance.new("TextButton")
+local UIStroke = Instance.new("UIStroke")
+local UIGradient = Instance.new("UIGradient")
+
+BananaLoader.Name = "BananaLoader_Premium"
+BananaLoader.Parent = game.CoreGui
+
+-- GŁÓWNA RAMKA
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = BananaLoader
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+MainFrame.Size = UDim2.new(0, 260, 0, 160)
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 15)
+
+-- ZŁOTA OBWÓDKA PREMIUM
+UIStroke.Parent = MainFrame
+UIStroke.Thickness = 4
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+UIGradient.Parent = UIStroke
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)), 
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 150)), 
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(218, 165, 32))
+}
+
+-- TYTUŁ
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "🍌 BANANA HUB [PREMIUM]"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0)
+Title.TextSize = 20
+
+-- STATUS DETEKCJI
+Status.Parent = MainFrame
+Status.BackgroundTransparency = 1
+Status.Position = UDim2.new(0, 0, 0, 55)
+Status.Size = UDim2.new(1, 0, 0, 30)
+Status.Font = Enum.Font.GothamMedium
+Status.TextSize = 14
+
+-- PRZYCISK EXECUTE
+ExecBtn.Parent = MainFrame
+ExecBtn.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+ExecBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+ExecBtn.Size = UDim2.new(0.8, 0, 0, 40)
+ExecBtn.Font = Enum.Font.GothamBold
+ExecBtn.Text = "EXECUTE PREMIUM"
+ExecBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+ExecBtn.TextSize = 16
+Instance.new("UICorner", ExecBtn).CornerRadius = UDim.new(0, 10)
+
+-- LOGIKA ŁADOWANIA
+local current = Scripts[GameId]
+
+if current then
+    Status.Text = "Authenticated: " .. current.Name
+    Status.TextColor3 = Color3.fromRGB(0, 255, 100)
+    
+    ExecBtn.MouseButton1Click:Connect(function()
+        ExecBtn.Text = "INJECTING..."
+        
+        local success, err = pcall(function()
+            loadstring(game:HttpGet(current.Raw))()
+        end)
+        
+        if success then
+            Notify("Banana Hub Premium", current.Name .. " Loaded! 🍌👑")
+            BananaLoader:Destroy()
+        else
+            Notify("Error", "Błąd ładowania skryptu.")
+            warn(err)
+            ExecBtn.Text = "RETRY"
+        end
+    end)
+else
+    Status.Text = "Game Not Supported ❌"
+    Status.TextColor3 = Color3.fromRGB(255, 0, 0)
+    ExecBtn.Text = "UNAVAILABLE"
+    ExecBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    ExecBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+end
+
+-- PRZYCISK ZAMKNIĘCIA
+local Close = Instance.new("TextButton")
+Close.Parent = MainFrame
+Close.BackgroundTransparency = 1
+Close.Position = UDim2.new(0.85, 0, 0, 5)
+Close.Size = UDim2.new(0.1, 0, 0, 30)
+Close.Text = "×"
+Close.TextColor3 = Color3.fromRGB(100, 100, 100)
+Close.TextSize = 25
+Close.MouseButton1Click:Connect(function() BananaLoader:Destroy() end)
