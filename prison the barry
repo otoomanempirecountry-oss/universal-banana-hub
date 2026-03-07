@@ -4,7 +4,7 @@ local _CoreGui = game:GetService('CoreGui')
 if not _CoreGui:FindFirstChild('Banana Hub') then
     local _ScreenGui = Instance.new('ScreenGui')
 
-    _ScreenGui.Name = 'VylikUI'
+    _ScreenGui.Name = 'Banana Hub'
     _ScreenGui.ResetOnSpawn = false
     _ScreenGui.IgnoreGuiInset = true
     _ScreenGui.Parent = _CoreGui
