@@ -1,33 +1,36 @@
--- SERVICES
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
--- GŁÓWNE GUI
+-- Usuwamy stare GUI jeśli istnieje, żeby się nie nakładały
+if CoreGui:FindFirstChild("LuckyBlockCommander") then
+    CoreGui:FindFirstChild("LuckyBlockCommander"):Destroy()
+end
+
+-- TWORZENIE GUI
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomBlockPanel"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+screenGui.Name = "LuckyBlockCommander"
+screenGui.Parent = CoreGui
 
--- RAMKA GŁÓWNA
+-- GŁÓWNA RAMKA (Żółto-Czarna)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 260, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -130, 0.5, -210)
-mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10) -- Głęboka czerń
+mainFrame.Size = UDim2.new(0, 260, 0, 450)
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -225)
+mainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
 local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.CornerRadius = UDim.new(0, 15)
 uiCorner.Parent = mainFrame
 
 local uiStroke = Instance.new("UIStroke")
-uiStroke.Color = Color3.fromRGB(255, 215, 0) -- Żółty/Złoty
+uiStroke.Color = Color3.fromRGB(255, 215, 0) -- Neonowy żółty
 uiStroke.Thickness = 2.5
 uiStroke.Parent = mainFrame
 
@@ -37,135 +40,125 @@ title.Size = UDim2.new(1, 0, 0, 50)
 title.BackgroundTransparency = 1
 title.Text = "BLOCK COMMANDER"
 title.TextColor3 = Color3.fromRGB(255, 215, 0)
-title.TextSize = 20
+title.TextSize = 18
 title.Font = Enum.Font.GothamBold
 title.Parent = mainFrame
 
--- LINIA POD TYTUŁEM
-local line = Instance.new("Frame")
-line.Size = UDim2.new(0.8, 0, 0, 2)
-line.Position = UDim2.new(0.1, 0, 0, 45)
-line.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
-line.BorderSizePixel = 0
-line.Parent = mainFrame
-
--- KONTENER NA PRZYCISKI (Z przewijaniem, jakby było ich dużo)
+-- LISTA PRZYCISKÓW (Scrolling)
 local scroll = Instance.new("ScrollingFrame")
-scroll.Size = UDim2.new(0.9, 0, 0.8, 0)
-scroll.Position = UDim2.new(0.05, 0, 0.15, 0)
+scroll.Size = UDim2.new(0.9, 0, 0.82, 0)
+scroll.Position = UDim2.new(0.05, 0, 0.13, 0)
 scroll.BackgroundTransparency = 1
 scroll.BorderSizePixel = 0
-scroll.ScrollBarThickness = 4
+scroll.ScrollBarThickness = 2
 scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 215, 0)
-scroll.CanvasSize = UDim2.new(0, 0, 0, 500) -- Możesz zwiększyć jak dodasz więcej
+scroll.CanvasSize = UDim2.new(0, 0, 0, 550) 
 scroll.Parent = mainFrame
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 8)
+layout.Padding = UDim.new(0, 10)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.Parent = scroll
 
 --- FUNKCJA TWORZENIA PRZYCISKU ---
 local function createButton(text, color, callback)
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0.95, 0, 0, 45)
-	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-	btn.Text = text:upper()
-	btn.TextColor3 = color
-	btn.Font = Enum.Font.GothamMedium
-	btn.TextSize = 13
-	btn.AutoButtonColor = false
-	btn.Parent = scroll
-	
-	local btnCorner = Instance.new("UICorner")
-	btnCorner.CornerRadius = UDim.new(0, 6)
-	btnCorner.Parent = btn
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.95, 0, 0, 45)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    btn.Text = text:upper()
+    btn.TextColor3 = color
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 13
+    btn.AutoButtonColor = false
+    btn.Parent = scroll
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btn
 
-	local btnStroke = Instance.new("UIStroke")
-	btnStroke.Color = color
-	btnStroke.Transparency = 0.7
-	btnStroke.Parent = btn
+    local btnStroke = Instance.new("UIStroke")
+    btnStroke.Color = color
+    btnStroke.Transparency = 0.7
+    btnStroke.Parent = btn
 
-	-- Logika kliknięcia
-	btn.MouseButton1Click:Connect(function()
-		-- Efekt kliknięcia
-		btn.BackgroundColor3 = color
-		btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-		
-		callback() -- Wykonaj to co przypisaliśmy
-		
-		task.wait(0.1)
-		btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-		btn.TextColor3 = color
-	end)
+    btn.MouseButton1Click:Connect(function()
+        -- Animacja "Flash"
+        btn.BackgroundColor3 = color
+        btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+        
+        callback() -- Wykonanie akcji
+        
+        task.wait(0.1)
+        btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        btn.TextColor3 = color
+    end)
 
-	-- Hover Effect
-	btn.MouseEnter:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
-		TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
-	end)
-	btn.MouseLeave:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
-		TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
-	end)
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
+        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
+        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
+    end)
 end
 
---- DEFINICJE PRZYCISKÓW I ICH AKCJI ---
+--- MAPOWANIE PRZYCISKÓW DO ŚCIEŻEK ---
 
--- 1. Normal Block
+-- 1. Normal
 createButton("Normal Block", Color3.fromRGB(255, 255, 255), function()
-	local ev = ReplicatedStorage:FindFirstChild("SpawnLuckyBlock")
-	if ev then ev:FireServer() end
+    ReplicatedStorage:WaitForChild("SpawnLuckyBlock"):FireServer()
 end)
 
--- 2. Galaxy Block
-createButton("Galaxy Block", Color3.fromRGB(180, 100, 255), function()
-	local ev = ReplicatedStorage:FindFirstChild("SpawnGalaxyBlock")
-	if ev then ev:FireServer() end
+-- 2. Galaxy
+createButton("Galaxy Block", Color3.fromRGB(160, 32, 240), function()
+    ReplicatedStorage:WaitForChild("SpawnGalaxyBlock"):FireServer()
 end)
 
--- 3. Rainbow Block
-createButton("Rainbow Block", Color3.fromRGB(255, 100, 100), function()
-	local ev = ReplicatedStorage:FindFirstChild("SpawnRainbowBlock")
-	if ev then ev:FireServer() end
+-- 3. Rainbow
+createButton("Rainbow Block", Color3.fromRGB(255, 100, 255), function()
+    ReplicatedStorage:WaitForChild("SpawnRainbowBlock"):FireServer()
 end)
 
--- 4. VOID BLOCK (3x Galaxy + 2x Rainbow)
+-- 4. Diamond (NOWE)
+createButton("Diamond Block", Color3.fromRGB(0, 255, 255), function()
+    ReplicatedStorage:WaitForChild("SpawnDiamondBlock"):FireServer()
+end)
+
+-- 5. Super Block (NOWE)
+createButton("Super Block", Color3.fromRGB(255, 0, 0), function()
+    ReplicatedStorage:WaitForChild("SpawnSuperBlock"):FireServer()
+end)
+
+-- 6. VOID BLOCK (Combo)
 createButton("VOID BLOCK", Color3.fromRGB(255, 215, 0), function()
-	for i = 1, 3 do
-		local ev = ReplicatedStorage:FindFirstChild("SpawnGalaxyBlock")
-		if ev then ev:FireServer() end
-	end
-	for i = 1, 2 do
-		local ev = ReplicatedStorage:FindFirstChild("SpawnRainbowBlock")
-		if ev then ev:FireServer() end
-	end
+    for i = 1, 3 do ReplicatedStorage:WaitForChild("SpawnGalaxyBlock"):FireServer() end
+    for i = 1, 2 do ReplicatedStorage:WaitForChild("SpawnRainbowBlock"):FireServer() end
 end)
 
--- 5. GET ALL ITEMS (100x Galaxy)
+-- 7. GET ALL ITEMS (100x Galaxy)
 createButton("GET ALL ITEMS", Color3.fromRGB(255, 215, 0), function()
-	for i = 1, 100 do
-		local ev = ReplicatedStorage:FindFirstChild("SpawnGalaxyBlock")
-		if ev then ev:FireServer() end
-		-- opcjonalnie: task.wait(0.01) jeśli serwer wywala za spam
-	end
+    for i = 1, 100 do
+        ReplicatedStorage:WaitForChild("SpawnGalaxyBlock"):FireServer()
+        if i % 20 == 0 then task.wait(0.05) end -- Lekka przerwa co 20, żeby nie wywaliło
+    end
 end)
 
---- SYSTEM PRZESUWANIA OKNA (Drag System) ---
+-- SYSTEM PRZESUWANIA (Drag)
 local dragging, dragInput, dragStart, startPos
 mainFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = mainFrame.Position
-	end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
 end)
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
 end)
 UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
 end)
