@@ -1,0 +1,96 @@
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TurboBananaBlack"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- GŁÓWNA RAMKA (Mini, Czarna, Movable)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 160, 0, 120) -- Jeszcze mniejsza
+mainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- Żółta linia (Banana Style)
+local line = Instance.new("Frame")
+line.Size = UDim2.new(1, 0, 0, 2)
+line.BackgroundColor3 = Color3.fromRGB(255, 230, 0)
+line.BorderSizePixel = 0
+line.Parent = mainFrame
+
+-- PRZYCISKI
+local function createBtn(text, pos)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 140, 0, 35)
+    btn.Position = pos
+    btn.BackgroundColor3 = Color3.fromRGB(255, 230, 0)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    btn.Font = Enum.Font.GothamBlack
+    btn.TextSize = 11
+    btn.Parent = mainFrame
+    Instance.new("UICorner").CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner").Parent = btn
+    return btn
+end
+
+local farmBtn = createBtn("TURBO FARM: OFF", UDim2.new(0.5, -70, 0.25, 0))
+local ragdollBtn = createBtn("ANTI-RAGDOLL: OFF", UDim2.new(0.5, -70, 0.65, 0))
+
+--- LOGIKA DRAGGABLE ---
+local dragging, dragStart, startPos
+mainFrame.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true dragStart = i.Position startPos = mainFrame.Position end end)
+UIS.InputChanged:Connect(function(i) if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then local d = i.Position - dragStart mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y) end end)
+UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+
+--- TURBO LOGIKA ---
+local isFarming = false
+local antiRagdoll = false
+local farmConnection -- Zmienna do trzymania połączenia pętli
+
+farmBtn.MouseButton1Click:Connect(function()
+    isFarming = not isFarming
+    farmBtn.Text = isFarming and "TURBO: ACTIVE" or "TURBO FARM: OFF"
+    farmBtn.BackgroundColor3 = isFarming and Color3.fromRGB(200, 255, 0) or Color3.fromRGB(255, 230, 0)
+    
+    if isFarming then
+        -- RenderStepped klika tak szybko, jak Twój komputer wyciąga FPS
+        farmConnection = RunService.RenderStepped:Connect(function()
+            -- SZYBKIE KLIKANIE FLOPPA
+            local floppa = workspace:FindFirstChild("Floppa")
+            if floppa then
+                local d = floppa:FindFirstChildOfClass("ClickDetector") or (floppa:IsA("ClickDetector") and floppa)
+                if d then fireclickdetector(d) end
+            end
+            
+            -- SZYBKI DOTYK WSZYSTKIEGO
+            for _, item in pairs(workspace:GetChildren()) do
+                if item:IsA("BasePart") and item.Name ~= "Baseplate" then
+                    firetouchinterest(character.PrimaryPart, item, 0)
+                    firetouchinterest(character.PrimaryPart, item, 1)
+                end
+            end
+        end)
+    else
+        if farmConnection then farmConnection:Disconnect() end
+    end
+end)
+
+ragdollBtn.MouseButton1Connect(function()
+    antiRagdoll = not antiRagdoll
+    ragdollBtn.Text = antiRagdoll and "STIFF: ON" or "ANTI-RAGDOLL: OFF"
+    local hum = character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, not antiRagdoll)
+        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, not antiRagdoll)
+    end
+end)
