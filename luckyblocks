@@ -1,116 +1,158 @@
--- Usługi
+-- SERVICES
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
-local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- Tworzenie Głównego GUI
+-- GŁÓWNE GUI
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "LuckyBlockPanel"
+screenGui.Name = "CustomBlockPanel"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Główna Ramka
+-- RAMKA GŁÓWNA
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 250, 0, 350)
-mainFrame.Position = UDim2.new(0.5, -125, 0.5, -175)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Ciemne tło
+mainFrame.Size = UDim2.new(0, 260, 0, 420)
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -210)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10) -- Głęboka czerń
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
--- Zaokrąglenie i Obramowanie
 local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 10)
+uiCorner.CornerRadius = UDim.new(0, 12)
 uiCorner.Parent = mainFrame
 
 local uiStroke = Instance.new("UIStroke")
-uiStroke.Color = Color3.fromRGB(255, 215, 0) -- Żółty neon
-uiStroke.Thickness = 2
+uiStroke.Color = Color3.fromRGB(255, 215, 0) -- Żółty/Złoty
+uiStroke.Thickness = 2.5
 uiStroke.Parent = mainFrame
 
--- Tytuł
+-- TYTUŁ
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
+title.Size = UDim2.new(1, 0, 0, 50)
 title.BackgroundTransparency = 1
-title.Text = "BLOCK SPAWNER"
+title.Text = "BLOCK COMMANDER"
 title.TextColor3 = Color3.fromRGB(255, 215, 0)
-title.TextSize = 18
+title.TextSize = 20
 title.Font = Enum.Font.GothamBold
 title.Parent = mainFrame
 
--- Kontener na przyciski (Lista)
-local listFrame = Instance.new("Frame")
-listFrame.Size = UDim2.new(0.9, 0, 0.8, 0)
-listFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
-listFrame.BackgroundTransparency = 1
-listFrame.Parent = mainFrame
+-- LINIA POD TYTUŁEM
+local line = Instance.new("Frame")
+line.Size = UDim2.new(0.8, 0, 0, 2)
+line.Position = UDim2.new(0.1, 0, 0, 45)
+line.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+line.BorderSizePixel = 0
+line.Parent = mainFrame
+
+-- KONTENER NA PRZYCISKI (Z przewijaniem, jakby było ich dużo)
+local scroll = Instance.new("ScrollingFrame")
+scroll.Size = UDim2.new(0.9, 0, 0.8, 0)
+scroll.Position = UDim2.new(0.05, 0, 0.15, 0)
+scroll.BackgroundTransparency = 1
+scroll.BorderSizePixel = 0
+scroll.ScrollBarThickness = 4
+scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 215, 0)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 500) -- Możesz zwiększyć jak dodasz więcej
+scroll.Parent = mainFrame
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 10)
+layout.Padding = UDim.new(0, 8)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.Parent = listFrame
+layout.Parent = scroll
 
 --- FUNKCJA TWORZENIA PRZYCISKU ---
-local function createButton(name, eventName)
+local function createButton(text, color, callback)
 	local btn = Instance.new("TextButton")
-	btn.Name = name .. "Btn"
-	btn.Size = UDim2.new(1, 0, 0, 45)
-	btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	btn.Text = name:upper()
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Size = UDim2.new(0.95, 0, 0, 45)
+	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	btn.Text = text:upper()
+	btn.TextColor3 = color
 	btn.Font = Enum.Font.GothamMedium
-	btn.TextSize = 14
+	btn.TextSize = 13
 	btn.AutoButtonColor = false
-	btn.Parent = listFrame
+	btn.Parent = scroll
 	
 	local btnCorner = Instance.new("UICorner")
 	btnCorner.CornerRadius = UDim.new(0, 6)
 	btnCorner.Parent = btn
 
 	local btnStroke = Instance.new("UIStroke")
-	btnStroke.Color = Color3.fromRGB(255, 215, 0)
-	btnStroke.Transparency = 0.6
+	btnStroke.Color = color
+	btnStroke.Transparency = 0.7
 	btnStroke.Parent = btn
 
-	-- Obsługa Eventu
+	-- Logika kliknięcia
 	btn.MouseButton1Click:Connect(function()
-		local event = ReplicatedStorage:FindFirstChild(eventName)
-		if event then
-			event:FireServer()
-			-- Mały efekt "flash" przy kliknięciu
-			btn.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
-			btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-			wait(0.1)
-			btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		else
-			warn("Brak eventu: " .. eventName)
-		end
+		-- Efekt kliknięcia
+		btn.BackgroundColor3 = color
+		btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+		
+		callback() -- Wykonaj to co przypisaliśmy
+		
+		task.wait(0.1)
+		btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+		btn.TextColor3 = color
 	end)
 
-	-- Efekt Hover (po najechaniu)
+	-- Hover Effect
 	btn.MouseEnter:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 50)}):Play()
+		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
 		TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
 	end)
-
 	btn.MouseLeave:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play()
-		TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.6}):Play()
+		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
+		TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
 	end)
 end
 
--- DODAWANIE TWOICH EVENTÓW
-createButton("Normal Block", "SpawnLuckyBlock")
-createButton("Galaxy Block", "SpawnGalaxyBlock")
-createButton("Rainbow Block", "SpawnRainbowBlock")
+--- DEFINICJE PRZYCISKÓW I ICH AKCJI ---
 
--- Możliwość przesuwania GUI (Drag)
-local UserInputService = game:GetService("UserInputService")
+-- 1. Normal Block
+createButton("Normal Block", Color3.fromRGB(255, 255, 255), function()
+	local ev = ReplicatedStorage:FindFirstChild("SpawnLuckyBlock")
+	if ev then ev:FireServer() end
+end)
+
+-- 2. Galaxy Block
+createButton("Galaxy Block", Color3.fromRGB(180, 100, 255), function()
+	local ev = ReplicatedStorage:FindFirstChild("SpawnGalaxyBlock")
+	if ev then ev:FireServer() end
+end)
+
+-- 3. Rainbow Block
+createButton("Rainbow Block", Color3.fromRGB(255, 100, 100), function()
+	local ev = ReplicatedStorage:FindFirstChild("SpawnRainbowBlock")
+	if ev then ev:FireServer() end
+end)
+
+-- 4. VOID BLOCK (3x Galaxy + 2x Rainbow)
+createButton("VOID BLOCK", Color3.fromRGB(255, 215, 0), function()
+	for i = 1, 3 do
+		local ev = ReplicatedStorage:FindFirstChild("SpawnGalaxyBlock")
+		if ev then ev:FireServer() end
+	end
+	for i = 1, 2 do
+		local ev = ReplicatedStorage:FindFirstChild("SpawnRainbowBlock")
+		if ev then ev:FireServer() end
+	end
+end)
+
+-- 5. GET ALL ITEMS (100x Galaxy)
+createButton("GET ALL ITEMS", Color3.fromRGB(255, 215, 0), function()
+	for i = 1, 100 do
+		local ev = ReplicatedStorage:FindFirstChild("SpawnGalaxyBlock")
+		if ev then ev:FireServer() end
+		-- opcjonalnie: task.wait(0.01) jeśli serwer wywala za spam
+	end
+end)
+
+--- SYSTEM PRZESUWANIA OKNA (Drag System) ---
 local dragging, dragInput, dragStart, startPos
-
 mainFrame.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
@@ -118,16 +160,12 @@ mainFrame.InputBegan:Connect(function(input)
 		startPos = mainFrame.Position
 	end
 end)
-
 UserInputService.InputChanged:Connect(function(input)
 	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 		local delta = input.Position - dragStart
 		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
 end)
-
 UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
-	end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
 end)
