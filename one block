@@ -1,0 +1,429 @@
+-- ts file was generated at discord.gg/25ms
+
+local _LocalPlayer = game.Players.LocalPlayer
+local _CoreGui = game:GetService('CoreGui')
+local _TweenService = game:GetService('TweenService')
+
+game:GetService('UserInputService')
+
+if not _CoreGui:FindFirstChild('VylikUI') then
+    local _ScreenGui = Instance.new('ScreenGui')
+
+    _ScreenGui.Name = 'VylikUI'
+    _ScreenGui.ResetOnSpawn = false
+    _ScreenGui.IgnoreGuiInset = true
+    _ScreenGui.Parent = _CoreGui
+
+    local _ImageLabel = Instance.new('ImageLabel')
+
+    _ImageLabel.Name = 'Shadow'
+    _ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    _ImageLabel.Size = UDim2.new(0, 305, 0, 270)
+    _ImageLabel.Position = UDim2.new(0.5, 10, 0.5, 20)
+    _ImageLabel.BackgroundTransparency = 1
+    _ImageLabel.Image = 'rbxassetid://136559706836779'
+    _ImageLabel.ScaleType = Enum.ScaleType.Slice
+    _ImageLabel.SliceCenter = Rect.new(60, 48, 64, 48)
+    _ImageLabel.SliceScale = 1.15
+    _ImageLabel.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    _ImageLabel.ZIndex = 0
+    _ImageLabel.Parent = _ScreenGui
+
+    local _Frame = Instance.new('Frame')
+
+    _Frame.Size = UDim2.new(0, 230, 0, 200)
+    _Frame.Position = UDim2.new(0.5, -105, 0.5, -80)
+    _Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    _Frame.BackgroundTransparency = 0
+    _Frame.BorderSizePixel = 0
+    _Frame.Active = true
+    _Frame.Draggable = false
+    _Frame.Name = 'MainFrame'
+    _Frame.ZIndex = 1
+    _Frame.Parent = _ScreenGui
+    Instance.new('UICorner', _Frame).CornerRadius = UDim.new(0, 12)
+
+    local _TextButton = Instance.new('TextButton')
+
+    _TextButton.Size = UDim2.new(0, 120, 0, 35)
+    _TextButton.Position = UDim2.new(1, -190, 0, 8)
+    _TextButton.Text = 'Hide GUI'
+    _TextButton.Font = Enum.Font.Gotham
+    _TextButton.TextSize = 22
+    _TextButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    _TextButton.TextColor3 = Color3.new(1, 1, 1)
+    _TextButton.Parent = _ScreenGui
+    Instance.new('UICorner', _TextButton).CornerRadius = UDim.new(0, 8)
+
+    local _TextButton2 = Instance.new('TextButton')
+
+    _TextButton2.Size = UDim2.new(0, 22.5, 0, 22.5)
+    _TextButton2.Position = UDim2.new(1, -28, 0, 5)
+    _TextButton2.Text = '\u{fffd}\u{fffd}\u{fe0f}'
+    _TextButton2.Font = Enum.Font.Gotham
+    _TextButton2.TextSize = 14
+    _TextButton2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    _TextButton2.TextColor3 = Color3.new(1, 1, 1)
+    _TextButton2.Parent = _Frame
+    Instance.new('UICorner', _TextButton2).CornerRadius = UDim.new(0, 8)
+
+    _TextButton2.MouseButton1Click:Connect(function()
+        _ScreenGui:Destroy()
+    end)
+
+    local u9 = false
+
+    _TextButton.MouseButton1Click:Connect(function()
+        u9 = not u9
+        _Frame.Visible = not u9
+        _ImageLabel.Visible = not u9
+
+        if not u9 then
+            _Frame.Position = UDim2.new(0.5, -105, 0.5, -80)
+            _ImageLabel.Position = UDim2.new(0.5, 10, 0.5, 20)
+        end
+
+        _TextButton.Text = u9 and 'Show GUI' or 'Hide GUI'
+    end)
+
+    local _TextLabel = Instance.new('TextLabel')
+
+    _TextLabel.Size = UDim2.new(1, 0, 0, 18)
+    _TextLabel.Position = UDim2.new(0, 0, 1, -30)
+    _TextLabel.BackgroundTransparency = 1
+    _TextLabel.Text = 'YouTube: VylikGylik Scripts'
+    _TextLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    _TextLabel.TextTransparency = 0.1
+    _TextLabel.TextSize = 23
+    _TextLabel.Font = Enum.Font.SourceSans
+    _TextLabel.Parent = _Frame
+
+    local _TextLabel2 = Instance.new('TextLabel')
+
+    _TextLabel2.Size = UDim2.new(1, 0, 0, 18)
+    _TextLabel2.Position = UDim2.new(0, -5, 1, -195)
+    _TextLabel2.BackgroundTransparency = 1
+    _TextLabel2.Text = 'ONE BLOCK'
+    _TextLabel2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    _TextLabel2.TextTransparency = 0.1
+    _TextLabel2.TextSize = 35
+    _TextLabel2.FontFace = Font.new('rbxassetid://12187375716')
+    _TextLabel2.Parent = _Frame
+
+    local u12 = nil
+    local u13 = nil
+    local u14 = nil
+    local u15 = nil
+    local _UserInputService = game:GetService('UserInputService')
+
+    _Frame.InputBegan:Connect(function(p17)
+        if p17.UserInputType == Enum.UserInputType.MouseButton1 or p17.UserInputType == Enum.UserInputType.Touch then
+            u12 = true
+            u14 = p17.Position
+            u15 = _Frame.Position
+
+            p17.Changed:Connect(function()
+                if p17.UserInputState == Enum.UserInputState.End then
+                    u12 = false
+                end
+            end)
+        end
+    end)
+    _Frame.InputChanged:Connect(function(p18)
+        if p18.UserInputType == Enum.UserInputType.MouseMovement or p18.UserInputType == Enum.UserInputType.Touch then
+            u13 = p18
+        end
+    end)
+    _UserInputService.InputChanged:Connect(function(p19)
+        if p19 == u13 and u12 then
+            local v20 = p19.Position - u14
+
+            _Frame.Position = UDim2.new(u15.X.Scale, u15.X.Offset + v20.X, u15.Y.Scale, u15.Y.Offset + v20.Y)
+            _ImageLabel.Position = UDim2.new(0.5, _Frame.Position.X.Offset + 115, 0.5, _Frame.Position.Y.Offset + 100)
+        end
+    end)
+
+    local _Frame2 = Instance.new('Frame', _Frame)
+
+    _Frame2.Size = UDim2.new(1, 0, 0, 25)
+    _Frame2.BackgroundTransparency = 1
+
+    local function v25(p22, p23)
+        local _TextButton3 = Instance.new('TextButton', _Frame2)
+
+        _TextButton3.Size = UDim2.new(0.5, -12.5, 1, 0)
+        _TextButton3.Position = UDim2.new(p23, 6, 0, 32)
+        _TextButton3.Text = p22
+        _TextButton3.Font = Enum.Font.Gotham
+        _TextButton3.TextSize = 20
+        _TextButton3.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        _TextButton3.TextColor3 = Color3.new(1, 1, 1)
+        Instance.new('UICorner', _TextButton3).CornerRadius = UDim.new(0, 8)
+
+        return _TextButton3
+    end
+
+    local _Main = v25('Main', 0)
+    local _ItemGiver = v25('Item Giver', 0.5)
+    local _Frame3 = Instance.new('Frame', _Frame)
+
+    _Frame3.Size = UDim2.new(1, -10, 1, -40)
+    _Frame3.Position = UDim2.new(0, 5, 0, 70)
+    _Frame3.BackgroundTransparency = 1
+
+    local _Frame4 = Instance.new('Frame', _Frame)
+
+    _Frame4.Size = _Frame3.Size
+    _Frame4.Position = _Frame3.Position
+    _Frame4.BackgroundTransparency = 1
+    _Frame4.Visible = false
+
+    local u30 = _Main
+
+    local function u33(p31, p32)
+        if u30 ~= p31 then
+            _TweenService:Create(u30, TweenInfo.new(0.25), {
+                BackgroundColor3 = Color3.fromRGB(45, 45, 45),
+                TextColor3 = Color3.new(1, 1, 1),
+            }):Play()
+
+            u30 = p31
+        end
+
+        _TweenService:Create(p31, TweenInfo.new(0.25), {
+            BackgroundColor3 = Color3.new(1, 1, 1),
+            TextColor3 = Color3.fromRGB(0, 0, 0),
+        }):Play()
+
+        _Frame3.Visible = p32 == _Frame3
+        _Frame4.Visible = p32 == _Frame4
+    end
+
+    _Main.MouseButton1Click:Connect(function()
+        u33(_Main, _Frame3)
+    end)
+    _ItemGiver.MouseButton1Click:Connect(function()
+        u33(_ItemGiver, _Frame4)
+    end)
+    u33(_Main, _Frame3)
+
+    local _TextButton4 = Instance.new('TextButton', _Frame3)
+
+    _TextButton4.Size = UDim2.new(0, 200, 0, 40)
+    _TextButton4.Position = UDim2.new(0, 10, 0, -1.5)
+    _TextButton4.Text = 'Inf Jump [OFF \u{274c}\u{fe0f}]'
+    _TextButton4.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    _TextButton4.TextSize = 15
+    _TextButton4.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new('UICorner', _TextButton4).CornerRadius = UDim.new(0, 8)
+
+    local u35 = false
+
+    _TextButton4.MouseButton1Click:Connect(function()
+        u35 = not u35
+        _TextButton4.Text = u35 and 'Inf Jump [ON \u{2705}\u{fe0f}]' or 'Inf Jump [OFF \u{274c}\u{fe0f}]'
+    end)
+    _UserInputService.JumpRequest:Connect(function()
+        if u35 and _LocalPlayer.Character and _LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+            _LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState('Jumping')
+        end
+    end)
+
+    local v36 = 5
+    local v37 = (200 - v36 * 4) / 5
+    local v38, v39, v40 = ipairs({
+        'Normal\nSpeed',
+        '25\nSpeed',
+        '50\nSpeed',
+        '75\nSpeed',
+        '100\nSpeed',
+    })
+    local u41 = _Frame4
+    local v42 = _Frame3
+    local v43 = 10
+    local u44 = {
+        ['Normal\nSpeed'] = 20,
+        ['25\nSpeed'] = 25,
+        ['50\nSpeed'] = 50,
+        ['75\nSpeed'] = 75,
+        ['100\nSpeed'] = 100,
+    }
+
+    while true do
+        local u45
+
+        v40, u45 = v38(v39, v40)
+
+        if v40 == nil then
+            break
+        end
+
+        local _TextButton5 = Instance.new('TextButton', v42)
+
+        _TextButton5.Size = UDim2.new(0, v37, 0, 30)
+        _TextButton5.Position = UDim2.new(0, v43 + (v40 - 1) * (v37 + v36), 0, 50)
+        _TextButton5.Text = u45
+        _TextButton5.Font = Enum.Font.Gotham
+        _TextButton5.TextSize = 13
+        _TextButton5.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        _TextButton5.TextColor3 = Color3.new(1, 1, 1)
+        Instance.new('UICorner', _TextButton5).CornerRadius = UDim.new(0, 8)
+
+        _TextButton5.MouseButton1Click:Connect(function()
+            if _LocalPlayer.Character and _LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+                pcall(function()
+                    _LocalPlayer.Character:FindFirstChildOfClass('Humanoid').WalkSpeed = u44[u45]
+                end)
+            end
+        end)
+    end
+
+    local v47 = {
+        Tools = {
+            'Diamond Sword',
+            'Diamond Pickaxe',
+            'Diamond Axe',
+            'Diamond Shovel',
+            'Diamond Hammer',
+            'Diamond Spear',
+            'Diamond Trident',
+            'Gold Sword',
+            'Gold Pickaxe',
+            'Gold Axe',
+            'Gold Shovel',
+            'Gold Hammer',
+            'Gold Spear',
+            'Gold Trident',
+            'Iron Sword',
+            'Iron Pickaxe',
+            'Iron Axe',
+            'Iron Shovel',
+            'Iron Hammer',
+            'Iron Spear',
+            'Iron Trident',
+            'Stone Sword',
+            'Stone Pickaxe',
+            'Stone Axe',
+            'Stone Shovel',
+            'Stone Hammer',
+            'Stone Spear',
+            'Stone Trident',
+            'Bandage',
+            'Medkit',
+            'Pickup Tool',
+            'Infinity Magnet',
+            'Diamond Magnet',
+            'Gold Magnet',
+            'Iron Magnet',
+            'Copper Magnet',
+            'Magnet',
+        },
+        BuildTools = {
+            'Farm Stand',
+            'Wood Cutter',
+            'Stone Smelter',
+            'Cooking Pot',
+            'Botanist Workbench',
+            'Platform Workbench',
+            'General Workbench',
+            'Forge Workbench',
+            'Loom Workbench',
+            'Carpenter Workbench',
+            'Drill',
+            'Farm Plot',
+            'Glass Blower Workbench',
+            'Lightkeeper Workbench',
+        },
+        Platform = {
+            'Oak Platform',
+            'Birch Platform',
+            'Cherry Platform',
+            'Bloodwood Platform',
+            'Acacia Platform',
+            'Grass Platform',
+            'Stone Platform',
+            'Granite Platform',
+            'Diorite Platform',
+            'Blackstone Platform',
+            'Green Wool Platform',
+            'Yellow Wool Platform',
+            'Red Wool Platform',
+            'Blue Wool Platform',
+            'Orange Wool Platform',
+            'Purple Wool Platform',
+        },
+    }
+    local u48 = nil
+
+    local function v61(p49, p50, p51)
+        local _Frame5 = Instance.new('Frame', u41)
+
+        _Frame5.Size = UDim2.new(0, 200, 0, 28)
+
+        local v53 = u41
+
+        _Frame5.Position = UDim2.new(0, 10, 0, (#v53:GetChildren() - 1) * 35)
+        _Frame5.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        Instance.new('UICorner', _Frame5).CornerRadius = UDim.new(0, 8)
+
+        local _TextButton6 = Instance.new('TextButton', _Frame5)
+
+        _TextButton6.Size = UDim2.new(1, 0, 1, 0)
+        _TextButton6.Text = p49 .. ' \u{25b6}'
+        _TextButton6.BackgroundTransparency = 1
+        _TextButton6.TextColor3 = Color3.new(1, 1, 1)
+        _TextButton6.Font = Enum.Font.Gotham
+        _TextButton6.TextSize = 16
+
+        local _ScrollingFrame = Instance.new('ScrollingFrame', _Frame5)
+
+        _ScrollingFrame.Size = UDim2.new(0, 180, 0, 120)
+        _ScrollingFrame.Position = UDim2.new(1, 5, 0, 0)
+        _ScrollingFrame.Visible = false
+        _ScrollingFrame.CanvasSize = UDim2.new(0, 0, #p50 * 1.08)
+        _ScrollingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        _ScrollingFrame.ScrollBarThickness = 0
+        _ScrollingFrame.BorderSizePixel = 0
+        Instance.new('UICorner', _ScrollingFrame).CornerRadius = UDim.new(0, 8)
+
+        local v56, v57, v58 = ipairs(p50)
+
+        while true do
+            local u59
+
+            v58, u59 = v56(v57, v58)
+
+            if v58 == nil then
+                break
+            end
+
+            local _TextButton7 = Instance.new('TextButton', _ScrollingFrame)
+
+            _TextButton7.Size = UDim2.new(1, -15, 0, 25)
+            _TextButton7.Position = UDim2.new(0, 7, 0, (v58 - 1) * 30)
+            _TextButton7.Text = u59
+            _TextButton7.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            _TextButton7.TextColor3 = Color3.new(1, 1, 1)
+            _TextButton7.Font = Enum.Font.Gotham
+            _TextButton7.TextSize = 14
+            Instance.new('UICorner', _TextButton7).CornerRadius = UDim.new(0, 6)
+
+            _TextButton7.MouseButton1Click:Connect(function()
+                game:GetService('ReplicatedStorage'):WaitForChild(p51):FireServer(u59, 0)
+            end)
+        end
+
+        _TextButton6.MouseButton1Click:Connect(function()
+            if u48 and u48 ~= _ScrollingFrame then
+                u48.Visible = false
+            end
+
+            _ScrollingFrame.Visible = not _ScrollingFrame.Visible
+            u48 = _ScrollingFrame.Visible and _ScrollingFrame or nil
+        end)
+    end
+
+    v61('Select Tool', v47.Tools, 'PurchaseGeneral')
+    v61('Select BuildTool', v47.BuildTools, 'PurchaseGeneral')
+    v61('Select Platform', v47.Platform, 'PurchaseTool')
+end
