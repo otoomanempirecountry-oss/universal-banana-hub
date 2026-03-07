@@ -1,5 +1,3 @@
--- ts file was generated at discord.gg/25ms
-
 local _LocalPlayer = game.Players.LocalPlayer
 local _CoreGui = game:GetService('CoreGui')
 local _TweenService = game:GetService('TweenService')
@@ -9,7 +7,7 @@ game:GetService('UserInputService')
 if not _CoreGui:FindFirstChild('VylikUI') then
     local _ScreenGui = Instance.new('ScreenGui')
 
-    _ScreenGui.Name = 'VylikUI'
+    _ScreenGui.Name = 'Banana HUb'
     _ScreenGui.ResetOnSpawn = false
     _ScreenGui.IgnoreGuiInset = true
     _ScreenGui.Parent = _CoreGui
