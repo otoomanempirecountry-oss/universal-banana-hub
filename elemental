@@ -1,0 +1,191 @@
+-- [[ 🍌 BANANA HUB V13 | ANCHOR KILLER + TEAM DISPLAY 🍌 ]] --
+-- [[ TOTAL ANTI-PUSH | 4s BYPASS | NO SWORDS ]] --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local LPlayer = Players.LocalPlayer
+
+-- [[ 1. LISTA SPELLI ]] --
+local spells_only = {
+    "Lava Ball", "Magam Fists", "Lava Dash", "Volcano Sentry", "Magma Spikes", "Nibiru",
+    "Blaster", "Bones Barrage", "Flying Bone", "Bone Surge", "Twin Blasters", "Judgement Blast",
+    "Unseen Hands", "Unseen Barrage", "Dark Duo", "Abyss", "Dark Hold", "Dark Arc",
+    "Light Ball", "Light Orbs", "Blinding Light", "Shooting Star", "Light Speed", "Light Beam",
+    "Fire Ball", "Fire Fly", "Fire Bomb", "Comet", "Combust", "Fire Shower"
+}
+
+-- [[ 2. UI SETUP ]] --
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 350, 0, 500)
+Main.Position = UDim2.new(0.5, -175, 0.5, -250)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Instance.new("UICorner", Main)
+
+local Header = Instance.new("Frame", Main)
+Header.Size = UDim2.new(1, 0, 0, 40)
+Header.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", Header)
+
+local Title = Instance.new("TextLabel", Header)
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Text = "BANANA V13 | ANCHOR KILLER"
+Title.TextColor3 = Color3.new(1, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.BackgroundTransparency = 1
+
+local Status = Instance.new("TextLabel", Main)
+Status.Size = UDim2.new(1, -20, 0, 25)
+Status.Position = UDim2.new(0, 10, 0, 45)
+Status.Text = "ANTY-BEAM: OFF"
+Status.TextColor3 = Color3.new(1, 0, 0)
+Status.BackgroundTransparency = 1
+
+-- [[ 3. ANTI-PUSH LOGIC ]] --
+local antiPushActive = false
+local function ToggleAntiPush()
+    antiPushActive = not antiPushActive
+    Status.Text = antiPushActive and "ANTY-BEAM: AKTYWNY" or "ANTY-BEAM: OFF"
+    Status.TextColor3 = antiPushActive and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+    task.spawn(function()
+        while antiPushActive do
+            if LPlayer.Character and LPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local root = LPlayer.Character.HumanoidRootPart
+                root.Velocity = Vector3.new(0,0,0)
+                for _, v in pairs(root:GetChildren()) do
+                    if v:IsA("BodyMover") then v:Destroy() end
+                end
+            end
+            RunService.Stepped:Wait()
+        end
+    end)
+end
+
+-- [[ 4. IMPROVED ANCHOR KILLER ]] --
+local function KillTarget(p)
+    local char = LPlayer.Character
+    local targetChar = p.Character
+    if char and targetChar and targetChar:FindFirstChild("HumanoidRootPart") then
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local tRoot = targetChar.HumanoidRootPart
+        
+        -- Zamrażamy postać, żeby nie spadła/nie odleciała
+        root.Anchored = true
+        
+        local attackTime = 0
+        local connection
+        connection = RunService.Heartbeat:Connect(function()
+            if targetChar and tRoot and attackTime < 40 then -- ok. 2-3 sekundy ataku
+                root.CFrame = tRoot.CFrame * CFrame.new(0, 0, 2)
+                attackTime = attackTime + 1
+            else
+                root.Anchored = false
+                connection:Disconnect()
+            end
+        end)
+
+        task.spawn(function()
+            for i = 1, 10 do
+                for _, tool in pairs(LPlayer.Backpack:GetChildren()) do
+                    if tool:IsA("Tool") then
+                        char.Humanoid:EquipTool(tool)
+                        tool:Activate()
+                    end
+                end
+                task.wait(0.15)
+            end
+            root.Anchored = false
+        end)
+    end
+end
+
+-- [[ 5. KILLER LIST ]] --
+local Scroll = Instance.new("ScrollingFrame", Main)
+Scroll.Size = UDim2.new(1, -20, 1, -160)
+Scroll.Position = UDim2.new(0, 10, 0, 140)
+Scroll.BackgroundTransparency = 1
+Scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Instance.new("UIListLayout", Scroll).Padding = UDim.new(0, 5)
+
+local function LoadKiller()
+    for _, v in pairs(Scroll:GetChildren()) do if v:IsA("Frame") then v:Destroy() end end
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LPlayer then
+            local Card = Instance.new("Frame", Scroll)
+            Card.Size = UDim2.new(1, -5, 0, 40)
+            Card.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            Instance.new("UICorner", Card)
+
+            local TeamStrip = Instance.new("Frame", Card)
+            TeamStrip.Size = UDim2.new(0, 5, 1, 0)
+            TeamStrip.BackgroundColor3 = p.TeamColor and p.TeamColor.Color or Color3.new(1,1,1)
+
+            local Name = Instance.new("TextLabel", Card)
+            Name.Position = UDim2.new(0, 12, 0, 0)
+            Name.Size = UDim2.new(1, -15, 1, 0)
+            Name.Text = p.Name .. " [" .. (p.Team and p.Team.Name or "No Team") .. "]"
+            Name.TextColor3 = p.TeamColor and p.TeamColor.Color or Color3.new(1,1,1)
+            Name.Font = Enum.Font.GothamBold
+            Name.TextXAlignment = Enum.TextXAlignment.Left
+            Name.BackgroundTransparency = 1
+
+            local b = Instance.new("TextButton", Card)
+            b.Size = UDim2.new(1, 0, 1, 0)
+            b.BackgroundTransparency = 1
+            b.Text = ""
+            b.MouseButton1Click:Connect(function() KillTarget(p) end)
+        end
+    end
+end
+
+-- [[ 6. GIVER & NAV ]] --
+local isGiving = false
+local function GiveSpells()
+    if isGiving then return end
+    isGiving = true
+    task.spawn(function()
+        for _, name in ipairs(spells_only) do
+            if not isGiving then break end
+            ReplicatedStorage.RemoteEvent:FireServer("equip_mystery_spell", name)
+            task.wait(4)
+        end
+        isGiving = false
+    end)
+end
+
+local Nav = Instance.new("Frame", Main)
+Nav.Size = UDim2.new(1, -20, 0, 60)
+Nav.Position = UDim2.new(0, 10, 0, 75)
+Nav.BackgroundTransparency = 1
+local Grid = Instance.new("UIGridLayout", Nav)
+Grid.CellSize = UDim2.new(0.5, -5, 0, 25)
+
+local function MakeBtn(txt, func, color)
+    local btn = Instance.new("TextButton", Nav)
+    btn.Text = txt
+    btn.BackgroundColor3 = color or Color3.fromRGB(45, 45, 45)
+    btn.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", btn)
+    btn.MouseButton1Click:Connect(func)
+end
+
+MakeBtn("FIX LIGHT BEAM", ToggleAntiPush, Color3.fromRGB(0, 80, 150))
+MakeBtn("GIVE SPELLS (4s)", GiveSpells, Color3.fromRGB(0, 100, 0))
+MakeBtn("REFRESH PLAYERS", LoadKiller)
+MakeBtn("STOP GIVER", function() isGiving = false end, Color3.fromRGB(100, 0, 0))
+
+-- Close & Drag
+local Close = Instance.new("TextButton", Header)
+Close.Size = UDim2.new(0, 30, 0, 30)
+Close.Position = UDim2.new(1, -35, 0, 5)
+Close.Text = "X"
+Close.BackgroundColor3 = Color3.new(0.6, 0, 0)
+Close.TextColor3 = Color3.new(1, 1, 1)
+Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+local d=false;local s;local p;Main.InputBegan:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 then d=true;s=i.Position;p=Main.Position end end)
+game:GetService("UserInputService").InputChanged:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseMovement and d then local delta=i.Position-s;Main.Position=UDim2.new(p.X.Scale,p.X.Offset+delta.X,p.Y.Scale,p.Y.Offset+delta.Y)end end)
+game:GetService("UserInputService").InputEnded:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 then d=false end end)
+
+LoadKiller()
