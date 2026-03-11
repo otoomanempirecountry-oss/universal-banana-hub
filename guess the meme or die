@@ -1,0 +1,102 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Auto Guesser | Rayfield Edition",
+   LoadingTitle = "Inicjalizacja skryptu...",
+   LoadingSubtitle = "by MegaGuru",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "AutoGuesserConfig",
+      FileName = "MainConfig"
+   }
+})
+
+-- Variables
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local VirtualInputManager = game:GetService('VirtualInputManager')
+local StartQuestionEvent = ReplicatedStorage.Events:WaitForChild('StartQuestion')
+local QuestionDataEvent = ReplicatedStorage.Events:WaitForChild('QuestionData')
+
+local allRounds = {}
+local autoEnabled = true
+local waitTime = 1.4
+
+-- Functionality
+local function PressKey(keyNumber)
+    if not autoEnabled then return end
+    local keyMap = {
+        [1] = Enum.KeyCode.One,
+        [2] = Enum.KeyCode.Two,
+        [3] = Enum.KeyCode.Three,
+        [4] = Enum.KeyCode.Four,
+    }
+    local keyCode = keyMap[keyNumber]
+    if keyCode then
+        VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+        task.wait(0.05)
+        VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+    end
+end
+
+-- Logic Hookups
+QuestionDataEvent.OnClientEvent:Connect(function(roundsTable)
+    for _, roundData in ipairs(roundsTable) do
+        allRounds[roundData.Round] = roundData
+    end
+end)
+
+StartQuestionEvent.OnClientEvent:Connect(function(data)
+    if not autoEnabled or not data or not data.RoundNumber then return end
+
+    local roundNumber = data.RoundNumber
+    local roundInfo = allRounds[roundNumber]
+    if not roundInfo then return end
+
+    if roundInfo.RoundType == 'Song' then
+        local correctIndex = table.find(roundInfo.Options, roundInfo.SongNum)
+        if correctIndex then
+            task.wait(waitTime)
+            PressKey(correctIndex)
+        end
+    elseif roundInfo.RoundType == 'Vote' then
+        task.wait(2) -- Głosowanie zazwyczaj szybciej
+        PressKey(1)
+    end
+end)
+
+-- UI Tabs
+local MainTab = Window:CreateTab("Główne", 4483362458) -- Ikona domu
+
+MainTab:CreateSection("Ustawienia Auto Guessera")
+
+MainTab:CreateToggle({
+   Name = "Włącz Auto Guess",
+   CurrentValue = true,
+   Flag = "AutoGuessToggle",
+   Callback = function(Value)
+      autoEnabled = Value
+   end,
+})
+
+MainTab:CreateSlider({
+   Name = "Opóźnienie odpowiedzi (sekundy)",
+   Range = {0, 10},
+   Increment = 0.1,
+   Suffix = "s",
+   CurrentValue = 1.4,
+   Flag = "WaitTimeSlider",
+   Callback = function(Value)
+      waitTime = Value
+   end,
+})
+
+MainTab:CreateSection("Informacje")
+
+MainTab:CreateParagraph({Title = "Jak to działa?", Content = "Skrypt przechwytuje poprawne odpowiedzi z serwera i symuluje kliknięcie klawiszy 1-4. Ustaw 1.4s dla 'Super Fast', lub powyżej 3s, żeby nie wzbudzać podejrzeń."})
+
+Rayfield:Notify({
+   Title = "Gotowe!",
+   Content = "Auto Guesser został pomyślnie załadowany.",
+   Duration = 5,
+   Image = 4483362458,
+})
