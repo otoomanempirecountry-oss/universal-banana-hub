@@ -1,0 +1,178 @@
+-- [[ 🍌 BANANA HUB | FINAL REFINED EDITION 🍌 ]] --
+-- Features: Insta-Collect, Manual Convert, 1M HP, God Mode, HeadStomp Aura
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🍌 BANANA HUB | FINAL",
+   LoadingTitle = "Banana Hub Loading...",
+   LoadingSubtitle = "by Banana Hub Team",
+   ConfigurationSaving = { Enabled = false }
+})
+
+-- Zmienne Globalne
+_G.AutoFarm = false
+_G.AutoUpgrade = false
+_G.GodMode = false
+_G.HeadStomp = false
+_G.StompRange = 20
+
+-- [[ ZAKŁADKA FARMING ]] --
+local MainTab = Window:CreateTab("Auto-Farm", 4483362458)
+MainTab:CreateSection("Coin Collection")
+
+local function CollectAll()
+    local coinsFolder = workspace:FindFirstChild("Coins")
+    local char = game.Players.LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if coinsFolder and root then
+        for _, coin in pairs(coinsFolder:GetChildren()) do
+            local touch = coin:IsA("BasePart") and coin or coin:FindFirstChildWhichIsA("BasePart")
+            if touch then
+                firetouchinterest(root, touch, 0)
+                firetouchinterest(root, touch, 1)
+            end
+        end
+    end
+end
+
+MainTab:CreateButton({
+   Name = "INSTA-COLLECT ALL",
+   Callback = function() CollectAll() end,
+})
+
+MainTab:CreateToggle({
+   Name = "AUTO-COLLECT LOOP",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.AutoFarm = Value
+       task.spawn(function()
+           while _G.AutoFarm do
+               CollectAll()
+               task.wait(0.1)
+           end
+       end)
+   end,
+})
+
+MainTab:CreateSection("Remote Actions")
+
+-- USUNIĘTO LOOP - TERAZ TYLKO GUZIK
+MainTab:CreateButton({
+   Name = "CONVERT NOW (MANUAL)",
+   Callback = function()
+       local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes", 2):WaitForChild("ConvertRequest", 2)
+       if remote then 
+           remote:FireServer()
+           Rayfield:Notify({Title = "Banana Hub", Content = "Converted successfully!", Duration = 2})
+       end
+   end,
+})
+
+-- [[ ZAKŁADKA COMBAT ]] --
+local CombatTab = Window:CreateTab("Combat", 4483362458)
+CombatTab:CreateSection("Head-Stomping (XD)")
+
+CombatTab:CreateToggle({
+   Name = "HeadStomp Aura (Feet -> Head)",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.HeadStomp = Value
+       if _G.HeadStomp then
+           task.spawn(function()
+               while _G.HeadStomp do
+                   local lplayer = game.Players.LocalPlayer
+                   local char = lplayer.Character
+                   local myFoot = char and (char:FindFirstChild("LeftFoot") or char:FindFirstChild("Left Leg"))
+                   
+                   if myFoot and char:FindFirstChild("HumanoidRootPart") then
+                       for _, player in pairs(game.Players:GetPlayers()) do
+                           if player ~= lplayer and player.Character and player.Character:FindFirstChild("Head") and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
+                               local head = player.Character.Head
+                               local dist = (char.HumanoidRootPart.Position - head.Position).Magnitude
+                               if dist < _G.StompRange then
+                                   firetouchinterest(myFoot, head, 0)
+                                   task.wait()
+                                   firetouchinterest(myFoot, head, 1)
+                               end
+                           end
+                       end
+                   end
+                   task.wait(0.1)
+               end
+           end)
+       end
+   end,
+})
+
+-- [[ ZAKŁADKA UPGRADES ]] --
+local UpgradeTab = Window:CreateTab("Upgrades", 4483362458)
+UpgradeTab:CreateSection("Auto-Buy Gain")
+
+UpgradeTab:CreateToggle({
+   Name = "AUTO-UPGRADE GAIN",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.AutoUpgrade = Value
+       task.spawn(function()
+           while _G.AutoUpgrade do
+               local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes", 2):WaitForChild("UpgradeBuyTokens", 2)
+               if remote then remote:FireServer("Gain") end
+               task.wait(0.5)
+           end
+       end)
+   end,
+})
+
+-- [[ ZAKŁADKA PLAYER - NIEŚMIERTELNOŚĆ ]] --
+local StatsTab = Window:CreateTab("Player", 4483362458)
+StatsTab:CreateSection("Immortal Mode")
+
+StatsTab:CreateButton({
+   Name = "SET 1,000,000 HP",
+   Callback = function()
+       local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+       if hum then
+           hum.MaxHealth = 1000000
+           hum.Health = 1000000
+       end
+   end,
+})
+
+StatsTab:CreateToggle({
+   Name = "FULL IMMORTALITY (GOD MODE)",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.GodMode = Value
+       task.spawn(function()
+           while _G.GodMode do
+               local char = game.Players.LocalPlayer.Character
+               local hum = char and char:FindFirstChildOfClass("Humanoid")
+               if hum then
+                   -- Jeśli HP spadnie, odnawia do miliona
+                   if hum.Health < 500000 then
+                       hum.MaxHealth = 1000000
+                       hum.Health = 1000000
+                   end
+               end
+               task.wait(0.1)
+           end
+       end)
+   end,
+})
+
+StatsTab:CreateButton({
+   Name = "FORCE RESPAWN / WRÓĆ",
+   Callback = function()
+       local char = game.Players.LocalPlayer.Character
+       if char then
+           char:BreakJoints() -- Zabija postać, żeby się zrespawnowała (Wróć)
+       end
+   end,
+})
+
+Rayfield:Notify({
+    Title = "BANANA HUB UPDATED",
+    Content = "Convert loop removed. Manual button ready! 🍌",
+    Duration = 4
+})
