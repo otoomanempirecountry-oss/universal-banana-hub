@@ -1,47 +1,36 @@
--- [[ 🍌 BANANA HUB | SAFE PLOT & SPEED EDITION 🍌 ]] --
+-- [[ 🍌 BANANA HUB | KAVO LOADER 🍌 ]] --
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("🍌 BANANA HUB | PLOT MASTER", "DarkTheme")
 
-local Window = Rayfield:CreateWindow({
-   Name = "🍌 BANANA HUB | SPEED & PLOT",
-   LoadingTitle = "Inicjalizacja Banana Settings...",
-   ConfigurationSaving = { Enabled = false }
-})
-
--- Zmienne kontrolne
+-- Zmienne
 _G.PlotCollect = false
 _G.WalkSpeed = 16
 local SelectedFloor = 1
 local SelectedSlot = 1
 
--- Funkcja pomocnicza do pobierania działki gracza
-local function GetPlayerPlot()
-    local playerName = game.Players.LocalPlayer.Name
-    -- Szuka obiektu o nazwie "Plot_TwójNick"
-    return workspace:FindFirstChild("Plot_" .. playerName)
+-- Funkcja szukania działki
+local function GetPlot()
+    local name = game.Players.LocalPlayer.Name
+    return workspace:FindFirstChild("Plot_" .. name) or workspace:FindFirstChild("Plot_banangames_1")
 end
 
--- [[ 1. FUNKCJA: COLLECT ALL FROM PLOT (FLOORS 1-10) ]] --
-local function CollectFromPlot()
-    local plot = GetPlayerPlot() -- Dynamiczne szukanie działki
-    local char = game.Players.LocalPlayer.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    
+-- [[ LOGIKA ZBIERANIA ]] --
+local function Collect()
+    local plot = GetPlot()
+    local root = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not plot or not root then return end
 
     for f = 1, 10 do
         local floor = plot:FindFirstChild("Floor" .. f)
-        if floor then
-            local slotsFolder = floor:FindFirstChild("Slots")
-            if slotsFolder then
-                for s = 1, 10 do
-                    local slot = slotsFolder:FindFirstChild("Slot" .. s)
-                    if slot then
-                        for _, obj in pairs(slot:GetDescendants()) do
-                            if obj:IsA("BasePart") or obj:IsA("MeshPart") then
-                                firetouchinterest(root, obj, 0)
-                                firetouchinterest(root, obj, 1)
-                            end
+        if floor and floor:FindFirstChild("Slots") then
+            for s = 1, 10 do
+                local slot = floor.Slots:FindFirstChild("Slot" .. s)
+                if slot then
+                    for _, obj in pairs(slot:GetDescendants()) do
+                        if obj:IsA("BasePart") then
+                            firetouchinterest(root, obj, 0)
+                            firetouchinterest(root, obj, 1)
                         end
                     end
                 end
@@ -50,126 +39,87 @@ local function CollectFromPlot()
     end
 end
 
--- [[ 2. FUNKCJA: SAFE UPGRADE ALL (ANTI-DETECTION) ]] --
-local function SafeUpgradeAll()
-    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Events", 5):WaitForChild("RequestSlotUpgrade", 5)
-    local plot = GetPlayerPlot() -- Dynamiczne szukanie działki
-    
-    if not remote or not plot then 
-        Rayfield:Notify({Title = "Błąd", Content = "Nie znaleziono Twojej działki!", Duration = 3})
-        return 
-    end
-
-    Rayfield:Notify({Title = "Banana Hub", Content = "Bezpieczny upgrade 1-10 w toku...", Duration = 4})
+-- [[ LOGIKA UPGRADE ]] --
+local function SafeUpgrade()
+    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RequestSlotUpgrade")
+    local plot = GetPlot()
+    if not remote or not plot then return end
 
     task.spawn(function()
         for f = 1, 10 do
-            local floorName = "Floor" .. f
-            local floor = plot:FindFirstChild(floorName)
-            if floor then
-                local slotsFolder = floor:FindFirstChild("Slots")
-                if slotsFolder then
-                    for s = 1, 10 do
-                        local slotName = "Slot" .. s
-                        if slotsFolder:FindFirstChild(slotName) then
-                            remote:FireServer(floorName, slotName)
-                            task.wait(math.random(35, 55) / 100) -- Bezpieczny delay
-                        end
-                    end
+            local fName = "Floor" .. f
+            if plot:FindFirstChild(fName) then
+                for s = 1, 10 do
+                    remote:FireServer(fName, "Slot" .. s)
+                    task.wait(0.4) -- Bezpieczny odstęp
                 end
                 task.wait(1)
             end
         end
-        Rayfield:Notify({Title = "Banana Hub", Content = "Upgrade zakończony!", Duration = 5})
     end)
 end
 
--- [[ RESZTA INTERFEJSU RAYFIELD ]] --
--- (Zostawiłem bez zmian, bo korzystają z powyższych funkcji)
+-- [[ INTERFEJS KAVO ]] --
 
-local MainTab = Window:CreateTab("Collector", 4483362458)
-MainTab:CreateButton({
-   Name = "COLLECT ALL FROM PLOT (ONCE)",
-   Callback = function() pcall(CollectFromPlot) end,
-})
-MainTab:CreateToggle({
-   Name = "AUTO COLLECT LOOP",
-   CurrentValue = false,
-   Callback = function(Value)
-       _G.PlotCollect = Value
-       task.spawn(function()
-           while _G.PlotCollect do
-               pcall(CollectFromPlot)
-               task.wait(1)
-           end
-       end)
-   end,
-})
+-- Tab: Collector
+local Main = Window:NewTab("Collector")
+local MainSection = Main:NewSection("Plot Collection")
 
-local UpgradeTab = Window:CreateTab("Upgrades", 4483362458)
-UpgradeTab:CreateButton({
-   Name = "SAFE UPGRADE ALL (FLOOR 1-10)",
-   Callback = function() SafeUpgradeAll() end,
-})
-UpgradeTab:CreateSlider({
-   Name = "Wybierz Piętro",
-   Range = {1, 10},
-   Increment = 1,
-   Suffix = "Floor",
-   CurrentValue = 1,
-   Callback = function(Value) SelectedFloor = Value end,
-})
-UpgradeTab:CreateSlider({
-   Name = "Wybierz Slot",
-   Range = {1, 10},
-   Increment = 1,
-   Suffix = "Slot",
-   CurrentValue = 1,
-   Callback = function(Value) SelectedSlot = Value end,
-})
-UpgradeTab:CreateButton({
-   Name = "UPGRADE SELECTED SLOT",
-   Callback = function()
-       local remote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RequestSlotUpgrade")
-       if remote then remote:FireServer("Floor" .. SelectedFloor, "Slot" .. SelectedSlot) end
-   end,
-})
+MainSection:NewButton("COLLECT ALL ONCE", "Zbiera wszystko z 10 pięter", function()
+    pcall(Collect)
+end)
 
-local PlayerTab = Window:CreateTab("Player Settings", 4483362458)
-PlayerTab:CreateSection("Movement Speed")
-PlayerTab:CreateSlider({
-   Name = "Szybkość Chodzenia (WalkSpeed)",
-   Range = {16, 200},
-   Increment = 1,
-   Suffix = " Speed",
-   CurrentValue = 16,
-   Callback = function(Value)
-       _G.WalkSpeed = Value
-       local char = game.Players.LocalPlayer.Character
-       local hum = char and char:FindFirstChildOfClass("Humanoid")
-       if hum then hum.WalkSpeed = Value end
-   end,
-})
+MainSection:NewToggle("AUTO COLLECT LOOP", "Automatyczne zbieranie co 1.5s", function(state)
+    _G.PlotCollect = state
+    task.spawn(function()
+        while _G.PlotCollect do
+            pcall(Collect)
+            task.wait(1.5)
+        end
+    end)
+end)
 
+-- Tab: Upgrades
+local Upgrade = Window:NewTab("Upgrades")
+local UpSection = Upgrade:NewSection("Safe Upgrade System")
+
+UpSection:NewButton("SAFE UPGRADE ALL (1-10)", "Ulepsza wszystkie sloty powoli", function()
+    SafeUpgrade()
+end)
+
+UpSection:NewSlider("Wybierz Piętro", "Wybierz piętro do ręcznego upgrade", 10, 1, function(s)
+    SelectedFloor = s
+end)
+
+UpSection:NewSlider("Wybierz Slot", "Wybierz slot do ręcznego upgrade", 10, 1, function(s)
+    SelectedSlot = s
+end)
+
+UpSection:NewButton("UPGRADE SELECTED SLOT", "Ulepsza wybrany slot", function()
+    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RequestSlotUpgrade")
+    remote:FireServer("Floor" .. SelectedFloor, "Slot" .. SelectedSlot)
+end)
+
+-- Tab: Player
+local Player = Window:NewTab("Player")
+local PSection = Player:NewSection("Movement")
+
+PSection:NewSlider("WalkSpeed", "Zmień prędkość chodzenia", 200, 16, function(s)
+    _G.WalkSpeed = s
+end)
+
+-- Pętla Speed (Anti-Reset)
 task.spawn(function()
     while true do
-        local char = game.Players.LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum and hum.WalkSpeed ~= _G.WalkSpeed then
-            hum.WalkSpeed = _G.WalkSpeed
-        end
+        local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = _G.WalkSpeed end
         task.wait(0.5)
     end
 end)
 
-local MiscTab = Window:CreateTab("Misc", 4483362458)
-MiscTab:CreateButton({
-   Name = "FORCE RESPAWN",
-   Callback = function() if game.Players.LocalPlayer.Character then game.Players.LocalPlayer.Character:BreakJoints() end end,
-})
-
-Rayfield:Notify({
-    Title = "BANANA HUB READY",
-    Content = "Teraz automatycznie wykrywam Twój nick! 🍌",
-    Duration = 5
-})
+-- Tab: Misc
+local Misc = Window:NewTab("Misc")
+Misc:NewSection("Settings")
+Misc:NewButton("FORCE RESPAWN", "Resetuje postać", function()
+    game.Players.LocalPlayer.Character:BreakJoints()
+end)
