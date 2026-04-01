@@ -1,125 +1,182 @@
--- [[ 🍌 BANANA HUB | KAVO LOADER 🍌 ]] --
+-- [[ 🍌 BANANA HUB | V19 - FINAL GOD & STEALER 🍌 ]] --
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("🍌 BANANA HUB | PLOT MASTER", "DarkTheme")
+local Window = Library.CreateLib("🍌 BANANA V19 | GOD & STEAL", "DarkTheme")
 
--- Zmienne
-_G.PlotCollect = false
-_G.WalkSpeed = 16
-local SelectedFloor = 1
-local SelectedSlot = 1
+-- Zmienne globalne
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
 
--- Funkcja szukania działki
-local function GetPlot()
-    local name = game.Players.LocalPlayer.Name
-    return workspace:FindFirstChild("Plot_" .. name) or workspace:FindFirstChild("Plot_banangames_1")
+_G.isGodmode = false
+_G.isStealer = false
+_G.RecallPos = nil
+_G.CustomSpeed = 16
+
+local ghostClone, connection, noclipConn = nil, nil, nil
+
+-- [[ FUNKCJA CZYSZCZĄCA ]] --
+local function cleanup()
+    _G.isGodmode = false
+    _G.isStealer = false
+    if connection then connection:Disconnect() connection = nil end
+    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
+    local char = player.Character
+    if char then
+        char.Humanoid.PlatformStand = false
+        char.Humanoid.WalkSpeed = 16
+        camera.CameraSubject = char.Humanoid
+    end
+    if ghostClone then ghostClone:Destroy() ghostClone = nil end
 end
 
--- [[ LOGIKA ZBIERANIA ]] --
-local function Collect()
-    local plot = GetPlot()
-    local root = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not plot or not root then return end
+-- [[ TABS ]] --
 
-    for f = 1, 10 do
-        local floor = plot:FindFirstChild("Floor" .. f)
-        if floor and floor:FindFirstChild("Slots") then
-            for s = 1, 10 do
-                local slot = floor.Slots:FindFirstChild("Slot" .. s)
-                if slot then
-                    for _, obj in pairs(slot:GetDescendants()) do
-                        if obj:IsA("BasePart") then
-                            firetouchinterest(root, obj, 0)
-                            firetouchinterest(root, obj, 1)
+-- --- TAB 1: GOD MODE (PODSTAWOWY) ---
+local GodTab = Window:NewTab("Basic God Mode")
+local GSec = GodTab:NewSection("Nieśmiertelność")
+
+GSec:NewToggle("BASIC GOD MODE", "Jesteś duchem, ale nie kradniesz", function(state)
+    _G.isGodmode = state
+    local char = player.Character
+    if not char then return end
+    
+    if _G.isGodmode then
+        cleanup()
+        _G.isGodmode = true
+        
+        -- Tworzenie Ducha
+        char.Archivable = true
+        ghostClone = char:Clone()
+        ghostClone.Name = "Ghost_Basic"
+        ghostClone.Parent = workspace
+        char.Archivable = false
+
+        char.Humanoid.PlatformStand = true
+        camera.CameraSubject = ghostClone.Humanoid
+
+        -- Noclip i Ruch
+        noclipConn = RunService.Stepped:Connect(function()
+            if char then
+                for _, v in ipairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then v.CanCollide = false end
+                end
+            end
+        end)
+
+        connection = RunService.Heartbeat:Connect(function()
+            if ghostClone and char and char:FindFirstChild("HumanoidRootPart") then
+                -- FIX SPEED: Ustawiamy prędkość obu postaci
+                char.Humanoid.WalkSpeed = _G.CustomSpeed
+                ghostClone.Humanoid.WalkSpeed = _G.CustomSpeed
+                
+                local moveDir = char.Humanoid.MoveDirection
+                ghostClone.Humanoid:Move(moveDir, false)
+                ghostClone.Humanoid.Jump = char.Humanoid.Jump
+                
+                if moveDir.Magnitude > 0 then
+                    local targetRot = CFrame.lookAt(ghostClone.HumanoidRootPart.Position, ghostClone.HumanoidRootPart.Position + moveDir)
+                    ghostClone.HumanoidRootPart.CFrame = ghostClone.HumanoidRootPart.CFrame:Lerp(targetRot, 0.25)
+                end
+                
+                -- Hitbox 15m pod duchem
+                char.HumanoidRootPart.CFrame = ghostClone.HumanoidRootPart.CFrame * CFrame.new(0, -15, 0)
+                char.HumanoidRootPart.Velocity = Vector3.zero
+            end
+        end)
+    else
+        cleanup()
+    end
+end)
+
+-- --- TAB 2: GOD STEALER (AGRESYWNY) ---
+local StealTab = Window:NewTab("God Stealer")
+local SSec = StealTab:NewSection("Auto-Kradzież & Recall")
+
+SSec:NewButton("1. ZAPISZ POZYCJĘ BAZY", "Tu wrócisz po kradzieży", function()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        _G.RecallPos = player.Character.HumanoidRootPart.CFrame
+        game.StarterGui:SetCore("SendNotification", {Title = "BAZA ZAPISANA", Text = "Możesz kraść!", Duration = 3})
+    end
+end)
+
+SSec:NewToggle("2. ACTIVATE GOD STEALER", "God Mode + Insta Recall", function(state)
+    _G.isStealer = state
+    local char = player.Character
+    if not char then return end
+
+    if _G.isStealer then
+        cleanup()
+        _G.isStealer = true
+        
+        char.Archivable = true
+        ghostClone = char:Clone()
+        ghostClone.Name = "Ghost_Stealer"
+        ghostClone.Parent = workspace
+        
+        char.Humanoid.PlatformStand = true
+        camera.CameraSubject = ghostClone.Humanoid
+
+        noclipConn = RunService.Stepped:Connect(function()
+            if char then
+                for _, v in ipairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then v.CanCollide = false end
+                end
+            end
+        end)
+
+        connection = RunService.Heartbeat:Connect(function()
+            if ghostClone and char and char:FindFirstChild("HumanoidRootPart") then
+                char.Humanoid.WalkSpeed = _G.CustomSpeed
+                ghostClone.Humanoid.WalkSpeed = _G.CustomSpeed
+                
+                local moveDir = char.Humanoid.MoveDirection
+                ghostClone.Humanoid:Move(moveDir, false)
+                
+                if moveDir.Magnitude > 0 then
+                    local targetRot = CFrame.lookAt(ghostClone.HumanoidRootPart.Position, ghostClone.HumanoidRootPart.Position + moveDir)
+                    ghostClone.HumanoidRootPart.CFrame = ghostClone.HumanoidRootPart.CFrame:Lerp(targetRot, 0.25)
+                end
+
+                char.HumanoidRootPart.CFrame = ghostClone.HumanoidRootPart.CFrame * CFrame.new(0, -15, 0)
+                
+                -- INSTA STEAL LOGIC
+                for _, p in ipairs(workspace:GetDescendants()) do
+                    if p:IsA("ProximityPrompt") and p.Enabled then
+                        local promptPos = p.Parent:GetPivot().Position
+                        if (ghostClone.HumanoidRootPart.Position - promptPos).Magnitude < 12 then
+                            char.HumanoidRootPart.CFrame = CFrame.new(promptPos)
+                            task.wait(0.05)
+                            fireproximityprompt(p)
+                            if _G.RecallPos then
+                                char.HumanoidRootPart.CFrame = _G.RecallPos * CFrame.new(0, -15, 0)
+                            end
+                            task.wait(0.1)
                         end
                     end
                 end
             end
-        end
-    end
-end
-
--- [[ LOGIKA UPGRADE ]] --
-local function SafeUpgrade()
-    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RequestSlotUpgrade")
-    local plot = GetPlot()
-    if not remote or not plot then return end
-
-    task.spawn(function()
-        for f = 1, 10 do
-            local fName = "Floor" .. f
-            if plot:FindFirstChild(fName) then
-                for s = 1, 10 do
-                    remote:FireServer(fName, "Slot" .. s)
-                    task.wait(0.4) -- Bezpieczny odstęp
-                end
-                task.wait(1)
-            end
-        end
-    end)
-end
-
--- [[ INTERFEJS KAVO ]] --
-
--- Tab: Collector
-local Main = Window:NewTab("Collector")
-local MainSection = Main:NewSection("Plot Collection")
-
-MainSection:NewButton("COLLECT ALL ONCE", "Zbiera wszystko z 10 pięter", function()
-    pcall(Collect)
-end)
-
-MainSection:NewToggle("AUTO COLLECT LOOP", "Automatyczne zbieranie co 1.5s", function(state)
-    _G.PlotCollect = state
-    task.spawn(function()
-        while _G.PlotCollect do
-            pcall(Collect)
-            task.wait(1.5)
-        end
-    end)
-end)
-
--- Tab: Upgrades
-local Upgrade = Window:NewTab("Upgrades")
-local UpSection = Upgrade:NewSection("Safe Upgrade System")
-
-UpSection:NewButton("SAFE UPGRADE ALL (1-10)", "Ulepsza wszystkie sloty powoli", function()
-    SafeUpgrade()
-end)
-
-UpSection:NewSlider("Wybierz Piętro", "Wybierz piętro do ręcznego upgrade", 10, 1, function(s)
-    SelectedFloor = s
-end)
-
-UpSection:NewSlider("Wybierz Slot", "Wybierz slot do ręcznego upgrade", 10, 1, function(s)
-    SelectedSlot = s
-end)
-
-UpSection:NewButton("UPGRADE SELECTED SLOT", "Ulepsza wybrany slot", function()
-    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RequestSlotUpgrade")
-    remote:FireServer("Floor" .. SelectedFloor, "Slot" .. SelectedSlot)
-end)
-
--- Tab: Player
-local Player = Window:NewTab("Player")
-local PSection = Player:NewSection("Movement")
-
-PSection:NewSlider("WalkSpeed", "Zmień prędkość chodzenia", 200, 16, function(s)
-    _G.WalkSpeed = s
-end)
-
--- Pętla Speed (Anti-Reset)
-task.spawn(function()
-    while true do
-        local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum.WalkSpeed = _G.WalkSpeed end
-        task.wait(0.5)
+        end)
+    else
+        cleanup()
     end
 end)
 
--- Tab: Misc
-local Misc = Window:NewTab("Misc")
-Misc:NewSection("Settings")
-Misc:NewButton("FORCE RESPAWN", "Resetuje postać", function()
-    game.Players.LocalPlayer.Character:BreakJoints()
+-- --- TAB 3: USTAWIENIA ---
+local Settings = Window:NewTab("Player Settings")
+local PSec = Settings:NewSection("Movement")
+
+PSec:NewSlider("WalkSpeed", "Prędkość Ducha", 500, 16, function(s)
+    _G.CustomSpeed = s
 end)
+
+PSec:NewButton("AWARYJNY RESET", "Naprawia postać", function()
+    cleanup()
+end)
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "BANANA V19 LOADED",
+    Text = "Speed Fix & God Mode ready! 🍌🔥",
+    Duration = 5
+})
