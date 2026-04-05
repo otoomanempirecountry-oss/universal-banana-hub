@@ -7,7 +7,7 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local Window = Fluent:CreateWindow({
     Title = "Be a Lucky Block",
-    SubTitle = "by banana hub team",
+    SubTitle = "by banana team",
     TabWidth = 160,
     Size = UDim2.fromOffset(550, 430),
     Acrylic = false,
@@ -498,7 +498,7 @@ RBTD:OnChanged(function(state)
     if state then
         storedParts = {}
         for _, obj in ipairs(folder:GetChildren()) do
-            if obj.Name ~= "base14" then
+            if obj.Name ~= "base15" then
                 table.insert(storedParts, obj)
                 obj.Parent = nil
             end
@@ -519,7 +519,7 @@ Tabs.Farm:AddButton({
     Title = "Teleport to End",
     Callback = function()
         local modelsFolder = workspace:WaitForChild("RunningModels")
-        local target = workspace:WaitForChild("CollectZones"):WaitForChild("base14")
+        local target = workspace:WaitForChild("CollectZones"):WaitForChild("base15")
         local targetCFrame = target.CFrame * CFrame.new(0, -5, 0)
         for _, obj in ipairs(modelsFolder:GetChildren()) do
             if obj:IsA("Model") then
@@ -556,7 +556,7 @@ AutoFarmToggle:OnChanged(function(state)
                 local humanoid = character:WaitForChild("Humanoid")
                 local userId = player.UserId
                 local modelsFolder = workspace:WaitForChild("RunningModels")
-                local target = workspace:WaitForChild("CollectZones"):WaitForChild("base14")
+                local target = workspace:WaitForChild("CollectZones"):WaitForChild("base15")
                 root.CFrame = CFrame.new(715, 39, -2122)
                 task.wait(0.3)
                 humanoid:MoveTo(Vector3.new(710, 39, -2122))
