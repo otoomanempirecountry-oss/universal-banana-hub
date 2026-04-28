@@ -1,0 +1,199 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "⚡ Legends of Speed | OP V.20",
+   LoadingTitle = "⚡ Legends of Speed | OP V.20",
+   LoadingSubtitle = "by Superior's Hub",
+   Theme = "DarkBlue",
+   ConfigurationSaving = { Enabled = true, FileName = "Big Hub" },
+   KeySystem = false
+})
+
+local MainTab = Window:CreateTab("🏘️Home", 4483362458)
+local PetsTab = Window:CreateTab("🐱(OP) Pets", 4483362458)
+local TeleportsTab = Window:CreateTab("📲Teleports", 4483362458)
+local ExtraTab = Window:CreateTab("📜Extra", 4483362458)
+
+local MainSection = MainTab:CreateSection("Auto-Farm")
+local PetsSection = PetsTab:CreateSection("Get Pets (OP)")
+local TeleportsSection = TeleportsTab:CreateSection("Islands")
+local ExtraSection = ExtraTab:CreateSection("Other")
+
+-- [AUTO-ORBS]
+local OrbsToggle = MainTab:CreateToggle({
+   Name = "Auto Orbs",
+   CurrentValue = false,
+   Flag = "Toggle1",
+   Callback = function(Value)
+      _G.Farm1 = Value
+      task.spawn(function()
+          while _G.Farm1 do task.wait()
+             for i,v in pairs(game.Workspace.orbFolder.City:GetChildren()) do
+                if v.Name ~= "Gem" then v.outerOrb.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame end
+             end
+          end
+      end)
+   end,
+})
+
+-- [AUTO-STEPS]
+local OrangeOrbsToggle = MainTab:CreateToggle({
+   Name = "Auto Steps",
+   CurrentValue = false,
+   Flag = "Toggle2",
+   Callback = function(Value)
+      _G.Steps = Value
+      task.spawn(function()
+          while _G.Steps do
+              game:GetService("ReplicatedStorage").rEvents.orbEvent:FireServer("collectOrb", "Orange Orb", "City")
+              task.wait(0.1)
+          end
+      end)
+   end,
+})
+
+-- [AUTO-REBIRTHS]
+local RebirthsToggle = MainTab:CreateToggle({
+   Name = "Auto Rebirths",
+   CurrentValue = false,
+   Flag = "Toggle3",
+   Callback = function(Value)
+      _G.Rebirth = Value
+      task.spawn(function()
+          while _G.Rebirth do task.wait(5)
+              game:GetService("ReplicatedStorage").rEvents.rebirthEvent:FireServer("rebirthRequest")
+          end
+      end)
+   end,
+})
+
+-- [INF PET GLITCH - TWOJA WERSJA]
+local PetsButton = PetsTab:CreateButton({
+   Name = "Inf Glitch Pet (Must have level 1 pet & WORKS IN SERVER)",
+   Callback = function()
+      Rayfield:Notify({Title="Glitch", Content="Odpalam pracownie...", Duration=2})
+      task.spawn(function()
+         while task.wait(0.01) do
+            local Event = game:GetService("ReplicatedStorage").rEvents.orbEvent
+            -- Twoja brutalna metoda wysyłania:
+            Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City") Event:FireServer("collectOrb", "Yellow Orb", "City")
+            print("pracownie")
+         end
+      end)
+   end,
+})
+
+-- [PET SHOP BUTTONS]
+
+PetsTab:CreateButton({
+   Name = "Buy Ultimate Overdrive Bunny",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Ultimate Overdrive Bunny")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy eternal dragon",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Eternal Nebula Dragon")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy flaming hedgedog",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Flaming Hedgehog")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy hypersonic pegasus",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Hypersonic Pegasus")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy swift samurai",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Swift Samurai")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy dark soul birdie",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Dark Soul Birdie")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy og speed",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("OG Speed")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy sensei",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Speedy Sensei")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy soul fusion dog",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Soul Fusion Dog")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+PetsTab:CreateButton({
+   Name = "Buy rainbow soul",
+   Callback = function()
+      local pet = game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Rainbow Soul")
+      game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(pet)
+   end,
+})
+
+-- [TELEPORTS]
+TeleportsTab:CreateButton({
+   Name = "Teleport to Main City",
+   Callback = function()
+      game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-576.27, 4.16, 410.03)
+   end,
+})
+
+TeleportsTab:CreateButton({
+   Name = "Teleport to Snow City",
+   Callback = function()
+      game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-488.59, 4.16, 2301.04)
+   end,
+})
+
+TeleportsTab:CreateButton({
+   Name = "Teleport to Magma City",
+   Callback = function()
+      game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(2345.34, 4.16, 4393.5)
+   end,
+})
+
+TeleportsTab:CreateButton({
+   Name = "Teleport to Jungle Island City",
+   Callback = function()
+      game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1681.85, 3.14, 12818.36)
+   end,
+})
+
+ExtraTab:CreateLabel("Credits to Superior Hub!", 4483362458, Color3.fromRGB(255, 255, 255), false)
+
+Rayfield:LoadConfiguration()
